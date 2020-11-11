@@ -10,11 +10,11 @@ class ProfileAdmin(admin.ModelAdmin):
     """
     用户信息后台配置
     """
-    list_display = ('uid', 'user_status', 'user_type', 'account', 'user_level', 'name',
+    list_display = ('uid', 'user_status', 'user_type', 'account', 'user_level', 'user_name',
                     'phone', 'city', 'cert_type', 'cert_number', 'introduction')
     list_filter = ('user_status', 'user_level', 'city')
-    search_fields = ('account', 'name', 'phone')
-    readonly_fields = ('uid', 'user_status', 'user_type', 'account', 'user_level', 'name',
+    search_fields = ('account', 'user_name', 'phone')
+    readonly_fields = ('uid', 'user_status', 'user_type', 'account', 'user_level', 'user_name',
                        'city', 'cert_type', 'cert_number')
     list_per_page = 25
 
