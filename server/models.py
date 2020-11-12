@@ -68,8 +68,8 @@ class Profile(CreateUpdateMixin):
 
 def user_directory_path(instance, filename):
     ext = filename.split('.').pop()
-    filename = '{0}{1}.{2}'.format(instance.name, instance.identity_card, ext)
-    return os.path.join(instance.major.name, filename)  # 系统路径分隔符差异，增强代码重用性
+    filename = '{0}.{1}'.format(instance.task_name, ext)
+    return os.path.join(str(instance.TASK_TYPE[instance.task_type][1]), filename)  # 系统路径分隔符差异，增强代码重用性
 
 
 class Task(CreateUpdateMixin):
@@ -104,7 +104,7 @@ class Task(CreateUpdateMixin):
 
     uid = models.UUIDField(_(u'召集令标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'召集令唯一标识', db_index=True, unique=True)
-    master = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE)
+    master = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, help_text=u'令主', verbose_name=_(u'令主'))
     task_type = models.IntegerField(_(u'召集令类型'), default=TECHNICAL, choices=TASK_TYPE, help_text=u'召集令类型')
     task_name = models.CharField(_(u'召集令名称'), max_length=32, blank=True, null=True, help_text=u'召集令名称')
     description = models.TextField(_(u'召集令描述'), max_length=200, blank=True, null=True, help_text=u'召集令描述')
@@ -142,8 +142,8 @@ class RequestTask(CreateUpdateMixin):
 
     uid = models.UUIDField(_(u'请求标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'请求标识', db_index=True, unique=True)
-    task = models.OneToOneField(to='Task', to_field='uid', on_delete=CASCADE)
-    slave = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE)
+    task = models.OneToOneField(to='Task', to_field='uid', on_delete=CASCADE, verbose_name=u'召集令', help_text=u'召集令')
+    slave = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, verbose_name=u'请求者', help_text=u'请求者')
     description = models.TextField(_(u'请求描述'), max_length=200, blank=True, null=True, help_text=u'请求描述')
     request_status = models.IntegerField(_(u'请求状态'), default=PENDING, choices=REQUEST_STATUS, help_text=u'请求状态')
 
@@ -157,7 +157,7 @@ class TaskSuccess(CreateUpdateMixin):
     """
     uid = models.UUIDField(_(u'召集成功标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'召集成功标识', db_index=True, unique=True)
-    task = models.OneToOneField(to='Task', to_field='uid', on_delete=CASCADE)
+    task = models.OneToOneField(to='Task', to_field='uid', on_delete=CASCADE, verbose_name=u'召集令', help_text=u'召集令')
     request = models.CharField(_(u'请求标识'), max_length=32, blank=False, null=True, help_text=u'请求标识', db_index=True)
     master = models.CharField(_(u'令主标识'), max_length=32, null=True, blank=False, help_text=u'令主标识')
     slave = models.CharField(_(u'接令者标识'), max_length=32, null=True, blank=False, help_text=u'接令者标识')
