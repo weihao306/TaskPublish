@@ -1,5 +1,5 @@
 from django.contrib import admin
-from server.models import Profile, Task, RequestTask
+from server.models import Profile, Task, Request
 
 
 # Register your models here.
@@ -30,7 +30,7 @@ class TaskAdmin(admin.ModelAdmin):
     召集令信息后台管理
     """
     list_display = ('uid', 'master', 'task_type', 'task_status', 'task_name',
-                    'description', 'people_number', 'end_time')
+                    'description', 'cur_people', 'max_people', 'end_time')
     list_filter = ('task_status', 'task_type')
     search_fields = ('task_name',)
     readonly_fields = ('uid',)
@@ -43,12 +43,12 @@ class TaskAdmin(admin.ModelAdmin):
         obj.delete()
 
 
-@admin.register(RequestTask)
+@admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
     """
     召集令请求管理
     """
-    list_display = ('uid', 'task', 'slave', 'description', 'request_status')
+    list_display = ('uid', 'task', 'requester', 'description', 'request_status')
     readonly_fields = ('uid',)
     search_fields = ('create_at', 'update_at')
     list_per_page = 25

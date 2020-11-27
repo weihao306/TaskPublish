@@ -104,11 +104,13 @@ class Task(CreateUpdateMixin):
 
     uid = models.UUIDField(_(u'召集令标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'召集令唯一标识', db_index=True, unique=True)
-    master = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, help_text=u'令主', verbose_name=_(u'令主'))
+    master = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, help_text=u'令主',
+                                  verbose_name=_(u'令主'))
     task_type = models.IntegerField(_(u'召集令类型'), default=TECHNICAL, choices=TASK_TYPE, help_text=u'召集令类型')
     task_name = models.CharField(_(u'召集令名称'), max_length=32, blank=True, null=True, help_text=u'召集令名称')
     description = models.TextField(_(u'召集令描述'), max_length=200, blank=True, null=True, help_text=u'召集令描述')
-    people_number = models.IntegerField(_(u'召集人数'), help_text=u'召集人数')
+    cur_people = models.IntegerField(_(u'当前召集人数'), help_text=u'当前召集人数')
+    max_people = models.IntegerField(_(u'最大召集人数'), help_text=u'最大召集人数')
     end_time = models.DateTimeField(_(u'结束日期'), null=True, blank=True, help_text=u'结束日期')
     task_status = models.IntegerField(_(u'召集令状态'), default=WAITING, choices=TASK_STATUS, help_text=u'召集令状态')
     photo = models.ImageField(_(u'介绍图片'), upload_to=user_directory_path, blank=True, null=True)
@@ -124,7 +126,7 @@ class Task(CreateUpdateMixin):
             return '/media/default/task.jpg'
 
 
-class RequestTask(CreateUpdateMixin):
+class Request(CreateUpdateMixin):
     """
     请求召集令关系表
     """
@@ -143,7 +145,7 @@ class RequestTask(CreateUpdateMixin):
     uid = models.UUIDField(_(u'请求标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'请求标识', db_index=True, unique=True)
     task = models.OneToOneField(to='Task', to_field='uid', on_delete=CASCADE, verbose_name=u'召集令', help_text=u'召集令')
-    slave = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, verbose_name=u'请求者', help_text=u'请求者')
+    requester = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, verbose_name=u'请求者', help_text=u'请求者')
     description = models.TextField(_(u'请求描述'), max_length=200, blank=True, null=True, help_text=u'请求描述')
     request_status = models.IntegerField(_(u'请求状态'), default=PENDING, choices=REQUEST_STATUS, help_text=u'请求状态')
 
@@ -151,25 +153,39 @@ class RequestTask(CreateUpdateMixin):
         return str(self.pk)
 
 
-class TaskSuccess(CreateUpdateMixin):
+class Success(CreateUpdateMixin):
     """
     召集令成功明细表
     """
     uid = models.UUIDField(_(u'召集成功标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'召集成功标识', db_index=True, unique=True)
-    task = models.OneToOneField(to='Task', to_field='uid', on_delete=CASCADE, verbose_name=u'召集令', help_text=u'召集令')
-    request = models.CharField(_(u'请求标识'), max_length=32, blank=False, null=True, help_text=u'请求标识', db_index=True)
-    master = models.CharField(_(u'令主标识'), max_length=32, null=True, blank=False, help_text=u'令主标识')
-    slave = models.CharField(_(u'接令者标识'), max_length=32, null=True, blank=False, help_text=u'接令者标识')
-    complete_date = models.DateTimeField(_(u'达成日期'), blank=False, help_text=u'达成日期')
+    request = models.OneToOneField(to='Request', to_field='uid', on_delete=CASCADE, verbose_name=u'请求标识', help_text=u'请求标识')
+    master = models.CharField(_(u'令主标识'), max_length=32, blank=False, help_text=u'令主标识')
+    slave = models.CharField(_(u'接令用户标识'), max_length=32, blank=False, help_text=u'接令用户标识')
     master_cost = models.IntegerField(_(u'令主支付费用'), help_text=u'令主支付费用')
-    slave_cost = models.IntegerField(_(u'接令者支付费用'), help_text=u'接令者支付费用')
-
-    def __str__(self):
-        return str(self.pk)
+    slave_cost = models.IntegerField(_(u'接令用户支付费用'), help_text=u'接令用户支付费用')
+    complete_date = models.DateTimeField(_(u'达成日期'), blank=False, help_text=u'达成日期')
 
 
-class IncomeSummary(CreateUpdateMixin):
+# class Slave(Success):
+#     """
+#     成功明细表附表，用于保存请求者相关信息
+#     """
+#     request = models.ForeignKey(to='Request', to_field='uid', on_delete=CASCADE, verbose_name=u'请求标识',
+#                                 help_text=u'请求标识')
+#     slave_id = models.CharField(_(u'请求用户标识'), max_length=32, null=True, blank=False, help_text=u'请求用户标识')
+#     slave_cost = models.IntegerField(_(u'接令支付费用'), default=0, help_text=u'接令支付费用')
+#
+#
+# class Master(Success):
+#     """
+#     成功明细表附表，用于保存令主相关信息
+#     """
+#     master_id = models.CharField(_(u'令主标识'), max_length=32, null=True, blank=False, help_text=u'令主标识')
+#     master_cost = models.IntegerField(_(u'令主支付费用'), default=0, help_text=u'令主支付费用')
+
+
+class Income(CreateUpdateMixin):
     """
     中介收益汇总表
     """

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 from django.conf.urls.static import static
 
@@ -24,6 +24,9 @@ from config import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='index'),
+    url(r'user/', include('server.user_urls')),
+    url(r'task/', include('server.task_urls')),
+    url(r'requests/', include('server.request_urls'))
 ]
 
 admin.site.site_header = "[召集令 管理系统]"
