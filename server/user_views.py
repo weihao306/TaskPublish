@@ -59,9 +59,8 @@ def login(request):
     account = request.POST.get('account', '')
     password = request.POST.get('password', '')
 
-    try:
-        p = Profile.objects.filter(account__exact=account)
-    except Profile.DoesNotExist:
+    p = Profile.objects.filter(account__exact=account)
+    if p. == 0:
         return json_response(300001, 'User Not Found', {})
     else:
         if p.password != password:
