@@ -17,7 +17,7 @@ def manage_request(request):
     """
     令主请求管理模块
     """
-    body = QueryDict(request.body)
+    body = json.loads(request.body)
     option = body.get('option', '')
     if option == '00':
         master_query(request)
@@ -37,9 +37,10 @@ def master_query(request):
     """
     查询请求信息
     """
-    task = request.GET.get('order_id', '')
+    body = json.loads(request.body)
+    task = body.get('order_id', '')
     try:
-        req = Request.objects.filter(task__exact=task)
+        req = Request.objects.filter(task__exact=task).values()
     except Request.DoesNotExist:
         return json_response(400001, 'Request Not Found', {})
     else:
@@ -52,7 +53,7 @@ def master_update(request):
     """
     更新召集令请求状态
     """
-    body = QueryDict(request.body)
+    body = json.loads(request.body)
     rid = body.get('request_id', '')
     time = body.get('time', '')
     status = body.get('state')
@@ -131,9 +132,10 @@ def slave_create(request):
     """
     接令者申请召集令
     """
-    task = request.POST.get('order_id', '')
-    req = request.POST.get('slave_id', '')
-    desc = request.POST.get('request_msg', '')
+    body = json.loads(request.body)
+    task = body.get('order_id', '')
+    req = body.get('slave_id', '')
+    desc = body.get('request_msg', '')
 
     try:
         Request.objects.create(
@@ -144,7 +146,7 @@ def slave_create(request):
     except Exception as e:
         return json_response(400003, 'Create Request Error', {'error': str(e)})
     else:
-        data = Request.objects.filter(task__exact=task, requester__exact=req)
+        data = Request.objects.filter(task__exact=task, requester__exact=req).values()
         return json_response(200, 'OK', serializers.serialize('json', data))
 
 
@@ -153,7 +155,7 @@ def slave_modify(request):
     """
     接令者修改申请信息
     """
-    body = QueryDict(request.body)
+    body = json.loads(request.body)
     req = body.get('request_id', '')
     msg = body.get('request_msg', '')
 
@@ -170,9 +172,10 @@ def slave_query(request):
     """
     接令人查询已经接受的召集令请求
     """
-    slave = request.GET.get('slave_uuid', '')
+    body = json.loads(request.body)
+    slave = body.get('slave_uuid', '')
     try:
-        task = Request.objects.filter(requester__exact=slave, request_status__exact=1)
+        task = Request.objects.filter(requester__exact=slave, request_status__exact=1).values()
     except Exception as e:
         return json_response(400005, 'Slave Query Error', {'error': str(e)})
     else:
@@ -184,7 +187,7 @@ def slave_delete(request):
     """
     接令人删除为同意的召集令请求
     """
-    body = QueryDict(request.body)
+    body = json.loads(request.body)
     req = body.get('request_id', '')
     try:
         Request.objects.filter(uid__exact=req, request_status__exact=0).delete()

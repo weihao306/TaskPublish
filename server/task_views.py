@@ -32,7 +32,7 @@ def all_task(request):
     """
     查询所有召集令的信息
     """
-    task = Task.objects.filter(status__exact=True)
+    task = Task.objects.all()
     data = serializers.serialize('json', task, fields=('updated_at',))
     return json_response(200, 'OK', data)
 
@@ -43,9 +43,10 @@ def query_task(request):
     """
     令主查询自己所有的召集令信息
     """
-    master = request.GET.get('uuid', '')
+    body = json.loads(request.body)
+    master = body.get('uuid', '')
     try:
-        task = Task.objects.filter(master__exact=master, status=True)
+        task = Task.objects.filter(master__exact=master, status=True).value()
     except Exception as e:
         return json_response(200001, 'Task Not Found', {'error': str(e)})
     else:
@@ -59,21 +60,22 @@ def create_task(request):
     """
     令主发布召集令
     """
-    master = request.POST.get('user_id', '')
-    task_type = request.POST.get('task_type', '')
-    task_name = request.POST.get('task_name', '')
-    description = request.POST.get('description', '')
-    cur_people = request.POST.get('cur_people', '')
-    max_people = request.POST.get('max_people', '')
-    created_at = request.POST.get('start_time', '')
-    end_time = request.POST.get('end_time', '')
-    task_status = request.POST.get('task_status', '')
-    photo = request.POST.get('photo')
+    body = json.loads(request.body)
+    master = body.get('user_id', '')
+    task_type = body.get('task_type', None)
+    task_name = body.get('task_name', '')
+    description = body.get('description', '')
+    cur_people = body.get('cur_people', '')
+    max_people = body.get('max_people', '')
+    created_at = body.get('start_time', '')
+    end_time = body.get('end_time', '')
+    task_status = 1
+    photo = body.get('photo')
 
     try:
-        p = Profile.objects.filter(uid__exact=master)
+        p = Profile.objects.filter(uid__exact=master).values()
     except Profile.DoesNotExist:
-        return json_response(*UserError.UserNotFound)
+        return json_response(200001, 'User Not Found', {})
     else:
         Task.objects.create(
             master=master,
@@ -89,7 +91,7 @@ def create_task(request):
         )
         try:
             task = Task.objects.filter(master__exact=master, created_at__exact=created_at, end_time__exact=end_time,
-                                       max_people__exact=max_people)
+                                       max_people__exact=max_people).values()
         except Exception as e:
             return json_response(200002, 'Task Create Error', {'error': str(e)})
         else:
@@ -101,10 +103,10 @@ def delete_task(request):
     """
     令主删除召集令
     """
-    delete = QueryDict(request.body)
+    body = json.loads(request.body)
     try:
-        task = delete.get('order_id', '')
-        Task.objects.filter(uid__exact=task).delete()
+        task = body.get('order_id', '')
+        Task.objects.get(uid=task).delete()
     except Exception as e:
         return json_response(200003, 'Task Delete Error', {'error': str(e)})
     else:
@@ -116,17 +118,17 @@ def update_task(request):
     """
     更新召集令信息
     """
-    put = QueryDict(request.body)
+    body = json.loads(request.body)
     try:
-        tid = put.get('order_id', '')
+        tid = body.get('order_id', '')
         task = Task.objects.filter(uid__exact=tid)
     except Task.DoesNotExist:
-        return json_response(*TaskError.TaskNotExist)
+        return json_response(200001, 'Task Not Found', {})
     else:
-        task.task_name = put.get('order_name', '')
-        task.task_type = put.get('order_type', '')
-        task.description = put.get('order_description', '')
-        task.photo = put.get('photo')
+        task.task_name = body.get('order_name', '')
+        task.task_type = body.get('order_type', '')
+        task.description = body.get('order_description', '')
+        task.photo = body.get('photo')
         try:
             task.save()
         except Exception as e:

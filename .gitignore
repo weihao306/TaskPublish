@@ -5,14 +5,7 @@
 # IntelliJ project files
 .idea
 *.iml
-out
-gen
-config/*
-config
-server/migrations
-server
-utils
-manage.py
-package-lock.json
-requirements.txt
-.gitignore
+.vscode
+client/dist
+client/node_modules
+client/dist/*
