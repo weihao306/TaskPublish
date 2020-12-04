@@ -1,7 +1,7 @@
 <template>
   <!-- Fork of/Credit to:  https://github.com/aofdev/vue-firebase-auth-vuex/blob/master/src/components/User/Signin.vue -->
   <v-container fill-height>
-    <v-layout row wrap justify-center >
+    <v-layout row wrap justify-center>
       <v-flex xs11 sm10 md8>
         <v-card class="mx-auto elevation-8">
           <!-- ERROR MESSAGE -->
@@ -17,33 +17,31 @@
               <v-flex xs12 md10>
                 <h1 class="text-center mb-5">欢迎来到'召集令'</h1>
                 <v-text-field
-                  id="ID"
-                  v-model="userInfo.account"
                   name="ID"
                   label="ID"
                   type="input"
                   required
+                  v-model="userInfo.account"
                 />
               </v-flex>
 
               <v-flex xs12 md10>
                 <v-text-field
-                  id="password"
-                  v-model="userInfo.password"
                   name="password"
-                  label="password"
+                  label="密码"
                   type="password"
                   required
+                  v-model="userInfo.password"
                 />
               </v-flex>
 
               <v-flex xs12 md10>
                 <v-text-field
-                  v-model="userInfo.nick_name"
                   name="nick_name"
                   label="昵称"
-                  type="nick_name"
+                  type="input"
                   required
+                  v-model="userInfo.nick_name"
                 />
               </v-flex>
 
@@ -53,6 +51,7 @@
                   label="电话"
                   type="number"
                   required
+                  v-model="userInfo.telephone"
                 ></v-text-field>
               </v-flex>
 
@@ -63,17 +62,37 @@
                   type="input"
                   required
                   outlined
+                  v-model="userInfo.introduction"
                 ></v-textarea>
               </v-flex>
-              
+
               <v-flex xs12 md10>
-                <v-checkbox label="二代身份证" v-model="value" value="value"></v-checkbox>
-                <v-checkbox label="护照" v-model="value" value="value"></v-checkbox>                
+                <v-text-field
+                  name="city"
+                  label="城市"
+                  type="input"
+                  required
+                  v-model="userInfo.city"
+                ></v-text-field>
+              </v-flex>
+
+              <v-flex xs12 md10>
+                <v-checkbox
+                  label="二代身份证"
+                  :value="userInfo.cert_type==='二代身份证'"
+                  @change="userInfo.cert_type = '二代身份证' "
+                ></v-checkbox>
+                <v-checkbox
+                  label="护照"
+                  :value="userInfo.cert_type ==='护照'"
+                  @change="userInfo.cert_type = '护照' "
+                ></v-checkbox>
                 <v-text-field
                   name="cert_number"
                   label="证件号码"
                   type="input"
                   required
+                  v-model="userInfo.cert_number"
                 ></v-text-field>
               </v-flex>
 
@@ -109,7 +128,7 @@
           </v-layout>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn outlined :to="{name:'Login'}">返回登录</v-btn>
+            <v-btn outlined :to="{ name: 'Login' }">返回登录</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -126,9 +145,10 @@ export default {
       password: undefined,
       nick_name: undefined,
       telephone: undefined,
-      introduction:undefined,
-      cert_type:undefined,
-      cert_number:undefined
+      introduction: undefined,
+      cert_type: undefined,
+      cert_number: undefined,
+      city: undefined,
     },
     error: false,
     submitStyle: "",

@@ -52,15 +52,19 @@ def register(request):
 
 @csrf_exempt
 @transaction.atomic
+# @require_http_methods(["POST"])
 def login(request):
     """
     用户登录模块
     """
+    
     account = request.POST.get('account', '')
     password = request.POST.get('password', '')
+    # account = request.POST['account']
+    # password = request.POST['password']
 
-    p = Profile.objects.filter(account__exact=account)
-    if p. == 0:
+    p = Profile.objects.filter(account__exact='admin')
+    if p.__len__() is 0:
         return json_response(300001, 'User Not Found', {})
     else:
         if p.password != password:

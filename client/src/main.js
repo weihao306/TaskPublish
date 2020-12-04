@@ -18,6 +18,8 @@ import VueAxios from "vue-axios";
 
 Vue.config.productionTip = false;
 
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+
 // Vue.use(ElementUI);
 Vue.use(vuetify);
 Vue.use(router);
