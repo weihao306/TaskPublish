@@ -14,6 +14,9 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# media files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
+MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -84,15 +87,15 @@ DATABASES = {
     }
 }
 
-REDIS = {
-    'default': {
-        'HOST': '112.74.57.177',
-        'PORT': 6379,
-        'USER': '',
-        'PASSWORD': '',
-        'db': 0,
-    }
-}
+# REDIS = {
+#     'default': {
+#         'HOST': '112.74.57.177',
+#         'PORT': 6379,
+#         'USER': '',
+#         'PASSWORD': '',
+#         'db': 0,
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
