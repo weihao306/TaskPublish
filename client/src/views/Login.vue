@@ -43,6 +43,8 @@
                     type="submit"
                     dark
                     ref="submitBtn"
+                    :color="loginBtn.color"
+                    :outlined="loginBtn.outlined"
                     @mouseover="mouseOver"
                     @mouseleave="mouseLeave"
                     :style="submitStyle"
@@ -95,6 +97,10 @@ export default {
     },
     error: false,
     submitStyle: "",
+    loginBtn:{
+      color:'black',
+      outlined:true
+    }
   }),
   methods: {
     postLogin: function () {
@@ -125,12 +131,12 @@ export default {
         });
     },
     mouseOver: function () {
-      this.$refs.submitBtn.color = "majorColor";
-      this.$refs.submitBtn.outlined = false;
+      this.loginBtn.color = "majorColor";
+      this.loginBtn.outlined = false;
     },
     mouseLeave: function () {
-      this.$refs.submitBtn.color = "black";
-      this.$refs.submitBtn.outlined = true;
+      this.loginBtn.color = "black";
+      this.loginBtn.outlined = true;
     },
   },
 };
