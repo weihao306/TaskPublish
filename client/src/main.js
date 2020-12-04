@@ -18,7 +18,7 @@ import VueAxios from "vue-axios";
 
 Vue.config.productionTip = false;
 
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 
 // Vue.use(ElementUI);
 Vue.use(vuetify);
