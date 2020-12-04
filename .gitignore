@@ -7,4 +7,12 @@
 *.iml
 out
 gen
+config/*
+config
 server/migrations
+server
+utils
+技术交流
+manage.py
+package-lock.json
+requirements.txt

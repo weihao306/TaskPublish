@@ -1,0 +1,156 @@
+<template>
+  <!-- Fork of/Credit to:  https://github.com/aofdev/vue-firebase-auth-vuex/blob/master/src/components/User/Signin.vue -->
+  <v-container align-center justify-center fill-height>
+    <v-layout row wrap align-center justify-center>
+      <v-flex xs10 sm8 mb6 lg6>
+        <v-card class="elevation-8">
+          <!-- ERROR MESSAGE -->
+          <v-layout v-if="error" row>
+            <v-flex xs12 sm6 offset-sm3>
+              <app-alert :text="error.message" @dismissed="onDismissed" />
+            </v-flex>
+          </v-layout>
+
+          <!-- Login/Signin -->
+          <v-layout row align-center justify-center class="py-5">
+            <v-form @submit.prevent="postLogin">
+              <v-flex xs12>
+                <h1 class="text-center mb-5">欢迎来到'召集令'</h1>
+                <v-text-field
+                  id="ID"
+                  v-model="userInfo.account"
+                  name="ID"
+                  label="ID"
+                  type="input"
+                  required
+                />
+              </v-flex>
+
+              <v-flex xs12>
+                <v-text-field
+                  id="password"
+                  v-model="userInfo.password"
+                  name="password"
+                  label="password"
+                  type="password"
+                  required
+                />
+              </v-flex>
+
+              <v-flex xs12 class="py-3">
+                <div class="text-center">
+                  <v-btn
+                    type="submit"
+                    dark
+                    ref="submitBtn"
+                    @mouseover="mouseOver"
+                    @mouseleave="mouseLeave"
+                    :style="submitStyle"
+                  >
+                    登录
+                    <v-icon right> mdi-lock-open </v-icon>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon>cached</v-icon>
+                    </span>
+                  </v-btn>
+                </div>
+
+                <div class="text-center mt-3">
+                  <v-btn color="grey" :to="{ name: 'Home' }">
+                    返回主页
+                    <v-icon right> mdi-logout-variant </v-icon>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon>cached</v-icon>
+                    </span>
+                  </v-btn>
+                </div>
+              </v-flex>
+            </v-form>
+          </v-layout>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <a
+              @click="
+                () => {
+                  this.$router.push({ name: 'Register' });
+                }
+              "
+            >
+              <p class="text-decoration-underline">还没有账号？</p>
+            </a>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
+</template>
+
+<script>
+export default {
+  name: "Login",
+  data: () => ({
+    userInfo: {
+      account: undefined,
+      password: undefined,
+    },
+    error: false,
+    submitStyle: "",
+  }),
+  methods: {
+    postLogin: function () {
+      this.axios
+        .post("api/user/login", this.userInfo)
+        .then((res) => {
+          // respone the userInfo
+          const userInfo = res.data;
+          console.log(userInfo);
+          if (res.status === 200) {
+            // const userInfo = {
+            //     uuid: 
+            //     nick_name: 
+            //     account: 
+            //     password: 
+            //     introduction: 
+            //     cert_type: 
+            //     cert_number: 
+            //   };
+            alert("登录成功");
+            this.$store.dispatch("loginAction",userInfo).then(() => {
+              this.$router.push({
+                name: "UserInfo",
+                params: { uuid: userInfo.uuid },
+              });              
+            });
+            // this.$Message.success(data.data.message)
+            // this.$router.params.uuid = userInfo["uuid"];
+          } else {
+            if (res.status === 300001) {
+              alert("用户名未注册");
+            } else if (res.status === 300002) {
+              alert("密码错误");
+            }
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    mouseOver: function () {
+      this.$refs.submitBtn.color = "majorColor";
+      this.$refs.submitBtn.outlined = false;
+    },
+    mouseLeave: function () {
+      this.$refs.submitBtn.color = "black";
+      this.$refs.submitBtn.outlined = true;
+    },
+  },
+};
+</script>
+
+<style lang="sass" scoped>
+.block
+  margin-top: 4rem
+
+.login :hover
+  color: yellow
+</style>

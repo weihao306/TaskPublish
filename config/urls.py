@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='index'),
     url(r'user/', include('server.user_urls')),
-    url(r'task/', include('server.task_urls')),
+    url(r'tasks/', include('server.task_urls')),
     url(r'requests/', include('server.request_urls'))
 ]
 
