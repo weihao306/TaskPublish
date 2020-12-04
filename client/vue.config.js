@@ -54,7 +54,7 @@ module.exports = {
   css: {
     extract: false
   },
-  
+
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
       return {
@@ -69,7 +69,9 @@ module.exports = {
         ]
       }
     }
-  }
+  },
+
+  assetsDir: 'static'
 }
 
 
