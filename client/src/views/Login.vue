@@ -105,29 +105,18 @@ export default {
           const userInfo = res.data;
           console.log(userInfo);
           if (res.status === 200) {
-            // const userInfo = {
-            //     uuid: 
-            //     nick_name: 
-            //     account: 
-            //     password: 
-            //     introduction: 
-            //     cert_type: 
-            //     cert_number: 
-            //   };
-            alert("登录成功");
-            this.$store.dispatch("loginAction",userInfo).then(() => {
-              this.$router.push({
-                name: "UserInfo",
-                params: { uuid: userInfo.uuid },
-              });              
-            });
-            // this.$Message.success(data.data.message)
-            // this.$router.params.uuid = userInfo["uuid"];
-          } else {
-            if (res.status === 300001) {
+            if (res.data.status === 300001) {
               alert("用户名未注册");
-            } else if (res.status === 300002) {
+            } else if (res.data.status === 300002) {
               alert("密码错误");
+            } else {
+              alert("登录成功");
+              this.$store.dispatch("loginAction", userInfo).then(() => {
+                this.$router.push({
+                  name: "UserInfo",
+                  params: { uuid: userInfo.uuid },
+                });
+              });
             }
           }
         })
