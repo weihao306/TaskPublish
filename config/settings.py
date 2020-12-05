@@ -51,7 +51,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# CORS_ORIGIN_ALLOW_ALL = True
+
+# CSRF_COOKIE_SECURE = False
+
+ALLOWED_HOSTS = ['*']
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
+#允许所有的请求头
+CORS_ALLOW_HEADERS = ('*')
 
 ROOT_URLCONF = 'config.urls'
 

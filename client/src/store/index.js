@@ -4,15 +4,15 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 // class User{
-//   uuid;
+//   uid;
 //   nickName;
 //   account;
 //   password;
 //   introduction;
 //   cert_type;
 //   cert_number;
-//   constructor(uuid,nickName,account,password,introduction,cert_type,cert_number) {
-//     this.uuid = uuid;
+//   constructor(uid,nickName,account,password,introduction,cert_type,cert_number) {
+//     this.uid = uid;
 //     this.nickName = nickName;
 //     this.account = account;
 //     this.password = password;

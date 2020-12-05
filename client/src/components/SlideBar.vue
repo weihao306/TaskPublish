@@ -21,7 +21,7 @@
               {{User.nick_name}}
             </v-list-item-title>
           </v-list-item-content>
-          <v-btn v-show="(User===undefined)"> 登录 </v-btn>
+          <!-- <v-btn v-show="(User===undefined)"> 登录 </v-btn> -->
 
           <v-btn icon @click.stop="SlideBarToggle = !SlideBarToggle">
             <v-icon>mdi-chevron-left</v-icon>
@@ -115,11 +115,14 @@ export default {
     List: Array,
     UserID: String,
     LogOutPathName: String,
-    User:Object
+    // User:Object
   },
   data() {
     return {
     };
+  },
+  computed:{
+    User:()=>this.$store.state.userInfo
   },
   watch: {
     SlideBarToggle: function (val) {

@@ -120,7 +120,7 @@ export default {
               this.$store.dispatch("loginAction", userInfo).then(() => {
                 this.$router.push({
                   name: "UserInfo",
-                  params: { uuid: userInfo.uuid },
+                  params: { uid: userInfo.uid },
                 });
               });
             }

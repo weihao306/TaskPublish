@@ -31,7 +31,7 @@
                   :to="{
                     name: 'SeekOrder',
                     params: {
-                      ordersBeenRequest_uuids: ordersBeenRequest_uuids,
+                      ordersBeenRequest_uids: ordersBeenRequest_uids,
                     },
                   }"
                   >寻找召集令</v-btn
@@ -58,7 +58,6 @@
             class="text-justify text-h5 font-weight-bold pb-1"
           >
             {{ request.name }}
-            
           </v-card-title>
           <v-card-title class="py-1">
             <v-chip
@@ -164,7 +163,7 @@
                     :to="{
                       name: 'OrderInfo',
                       params: {
-                        order_id: order.uuid,
+                        order_id: order.uid,
                         backWardRouteName: 'Masses',
                       },
                     }"
@@ -240,7 +239,7 @@ import Order from "@/classes/Order.js";
 import Request from "@/classes/Request.js";
 export default {
   computed: {
-    ordersBeenRequest_uuids: (vm) => [
+    ordersBeenRequest_uids: (vm) => [
       ...vm.requestList.map((obj) => obj.order_id),
     ],
   },
@@ -252,7 +251,7 @@ export default {
       statusColor: ["warning", "success", "error"],
       joinRequests: [
         {
-          order_uuid: undefined,
+          order_uid: undefined,
           request_msg: undefined,
         },
       ],
@@ -266,7 +265,7 @@ export default {
     for (let i = 0; i < 10; i++) {
       this.orderList.push(
         new Order({
-          uuid: 111,
+          uid: 111,
           name: "test " + i,
           info:
             "testingjdialsjdialshdhaisdsahjnikdsahjikdjhasjdlasjildjalinljdiasildaskjdialsjdiajdaslijdajdlikjislajdilajlik",
@@ -277,11 +276,11 @@ export default {
       );
     }
 
-    this.getRequestList(this.$store.state.userInfo.uuid);
+    this.getRequestList(this.$store.state.userInfo.uid);
   },
   methods: {
     getOrderList() {
-      this.axios.get("api/tasks").then((res) => {
+      this.axios.get("api/tasks", { params: { all: true } }).then((res) => {
         const data = res.data;
         for (let each of data) {
           let newOrder = new Order(each);
@@ -292,7 +291,7 @@ export default {
     },
     getRequestList(slave_id) {
       this.axios
-          .get("api/requests", {
+        .get("api/requests", {
           params: { option: "12", slave_id: slave_id },
         })
         .then((res) => {
@@ -315,9 +314,7 @@ export default {
     deleteInfoAction(order, index) {
       order.deleteInfo = false;
       this.axios
-        .delete("api/tasks", {
-          params: { uuid: order.uuid },
-        })
+        .delete("api/tasks", { uid: order.uid })
         .then((res) => {
           this.orderList.splice(index, 1);
         })
@@ -328,11 +325,9 @@ export default {
     modifyRequestAction(request) {
       this.axios
         .put("api/requests", {
-          params: {
-            option: "11",
-            request_id: request.uuid,
-            request_msg: request.msg,
-          },
+          option: "11",
+          request_id: request.uid,
+          request_msg: request.msg,
         })
         .then((res) => {
           if (res.status === 200) {

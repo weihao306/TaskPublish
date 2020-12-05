@@ -34,8 +34,8 @@ module.exports = {
         // target: "https://yapi.baidu.com/mock/17108/",
         // port:38080,
         // 将主机标头的原点更改为目标URL
-        changeOrigin: true,
-        ws:true,
+        changeOrigin: false,
+        // ws:true,
         pathRewrite: {
           "^/api/": ""
         },

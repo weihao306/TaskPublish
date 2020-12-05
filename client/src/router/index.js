@@ -61,11 +61,11 @@ const mainViews = [{
     }
   },
   {
-    path: 'User/:uuid',
+    path: 'User/:uid',
     name: 'UserInfo',
     props: true,
     params: {
-      uuid: String
+      uid: String
     },
     component: () => import('../views/User/Info.vue'),
     meta: {
