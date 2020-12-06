@@ -196,9 +196,9 @@ export default {
     // this.userInfo = this.$store.state.userInfo;
     // this.getUserInfo();
   },
-  props:{
-    uid:String
-  },
+  // props:{
+  //   uid:String
+  // },
   data() {
     return {
       modifyInfoSwitcher: false,

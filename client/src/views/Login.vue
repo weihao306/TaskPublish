@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import qs from "qs";
+// import qs from "qs";
 export default {
   name: "Login",
   data: () => ({
@@ -106,9 +106,7 @@ export default {
   methods: {
     postLogin: function () {
       this.axios
-        .post("api/user/login", qs.stringify(this.userInfo), {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        })
+        .post("api/user/login", this.userInfo)
         .then((res) => {
           // respone the userInfo
           const userInfo = res.data;

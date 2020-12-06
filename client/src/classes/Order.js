@@ -1,4 +1,4 @@
-class Order {
+export default class Order {
     uid = undefined;
     master_id = undefined;
     name = undefined;
@@ -22,20 +22,21 @@ class Order {
     };
     // uid,name, info, currentSummoningCount, maximumSummoningCount
     constructor(args) {
-        this.uid = args["uid"];
-        this.master_id = args["master"]
-        this.name = args["task_name"];
-        this.info = args["description"];
-        this.currentSummoningCount = args["cur_people"];
-        this.maximumSummoningCount = args["max_people"];
-        this.type = args['task_type'];
-        this.status = args["task_status"];
-        this.end_date = args["end_time"];
-        this.joinRequests = args["joinRequest"];
+        if(args instanceof Object){
+            this.uid = args["uid"];
+            this.master_id = args["master"]
+            this.name = args["task_name"];
+            this.info = args["description"];
+            this.currentSummoningCount = args["cur_people"];
+            this.maximumSummoningCount = args["max_people"];
+            this.type = args['task_type'];
+            this.status = args["task_status"];
+            this.end_date = args["end_time"];
+            this.joinRequests = args["joinRequest"];
+        }
     }
 
     getPhotos(args){
         this.photos = args["photos"];
     }
 }
-export default Order;
