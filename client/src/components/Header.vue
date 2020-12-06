@@ -17,12 +17,13 @@
     <!-- 小屏幕导航栏 -->
     <v-menu offset-y activator bottom right>
       <!-- <v-btn color="primary" dark slot="activator" class="hidden-md-and-up">导航</v-btn> -->
-      <template v-slot:activator="{ on }">
+      <template v-slot:activator="{ on,attrs }">
         <v-btn
           color="majorColor"
           dark
           class="hidden-sm-and-up"
           v-on="on"
+          v-bind="attrs"
           min-width="5.5rem"
         >
           导航

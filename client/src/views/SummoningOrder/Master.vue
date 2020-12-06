@@ -72,7 +72,7 @@
                         v-bind="attrs"
                         v-on="on"
                         class="mr-2"
-                        @click="getOrderRequest(order.uuid)"
+                        @click="getOrderRequest(order.uid)"
                       >
                         申请情况
                       </v-btn>
@@ -110,7 +110,7 @@
                                 <blockquote
                                   class="text-justify text-h5 font-weight-bold"
                                 >
-                                  申请人:{{ request.requestUserName }}
+                                  申请人:{{ request.requesterName }}
                                 </blockquote>
                               </v-card-text>
                               <v-card-actions v-show="request.state === 0">
@@ -151,7 +151,7 @@
                     :to="{
                       name: 'OrderInfo',
                       params: {
-                        order_id: order.uuid,
+                        order_id: order.uid,
                         backWardRouteName: 'Master',
                       },
                     }"
@@ -200,7 +200,7 @@
                       dark
                       v-bind="attrs"
                       v-on="on"
-                      @click.stop="modifyInfoInit(order)"
+                      @click.stop="modifyOrderInit(order)"
                     >
                       修改信息
                     </v-btn>
@@ -253,7 +253,7 @@
                       <v-btn
                         color="primary"
                         text
-                        @click="modifyInfoAction(order, modify, index)"
+                        @click="modifyOrderAction(order, modify, index)"
                       >
                         完成
                       </v-btn>
@@ -328,7 +328,7 @@ export default {
     // for (let i = 0; i < 10; i++) {
     //   this.orderList.push(
     //     new Order({
-    //       uuid: 123,
+    //       uid: 123,
     //       name: "test " + i,
     //       info: "testingdasuhduahdhasdhsaklhduikjahduaikshndukasjh",
     //       currentSummoningCount: 0,
@@ -347,21 +347,23 @@ export default {
     getOrderList() {
       this.axios
         .get("api/tasks", {
-          params: { master_id: this.$store.state.userInfo.uuid },
+          params: { master_id: this.$store.state.userInfo.uid },
         })
         .then((res) => {
           const data = res.data;
-          for (let each of data) {
-            let newOrder = new Order(each);
-            this.orderList.push(newOrder);
-            newOrder = null;
+          if (res.status === 200) {
+            for (let each of data) {
+              let newOrder = new Order(each);
+              this.orderList.push(newOrder);
+              newOrder = null;
+            }
+            this.$store.commit("saveOrders", this.orderList);
           }
-          this.$store.commit("saveOrders", this.orderList);
         });
     },
     getOrderRequest(order_id) {
       this.axios
-        .get("api/requests", { params: { order_id: order_id } })
+        .get("api/requests", { params: { option: "00", order_id: order_id } })
         .then((res) => {
           if (res.status === 200) {
             this.requestList = [];
@@ -373,22 +375,20 @@ export default {
           }
         });
     },
-    modifyInfoInit(order) {
+    modifyOrderInit(order) {
       this.modify.name = order.name;
       this.modify.info = order.info;
     },
-    modifyInfoAction(order, putInfo, index) {
+    modifyOrderAction(order, putInfo, index) {
       if (putInfo.info.length > 20) {
         alert("必须不大于20个字");
       } else {
         order.modifyDialogSwitcher = false;
         this.axios
           .put("api/tasks", {
-            params: {
-              uuid: order.uuid,
-              name: putInfo.name,
-              info: putInfo.info,
-            },
+            order_id: order.uid,
+            order_name: putInfo.name,
+            order_description: putInfo.info,
           })
           .then((res) => {
             if (res.status === 200) {
@@ -404,12 +404,12 @@ export default {
     deleteInfoAction(order, index) {
       order.deleteInfo = false;
       this.axios
-        .delete("api/tasks", {
-          params: { uuid: order.uuid },
-        })
+        .delete("api/tasks", { uid: order.uid })
         .then((res) => {
           if (res.status === 200) {
             this.orderList.splice(index, 1);
+          } else {
+            alert("删除失败");
           }
         })
         .catch((err) => {
@@ -417,39 +417,19 @@ export default {
         });
     },
     acceptTheRequest(index) {
+      this.updateRequest(index, 1);
+    },
+    denyTheRequest(index) {
+      this.updateRequest(index, 0);
+    },
+    updateRequest(index, state) {
       let request = this.requestList[index];
       this.axios
         .put("api/requests", {
-          params: {
-            option: "01",
-            request_id: request.uuid,
-            state: 1,
-            time: this.date.toLocaleDateString(),
-          },
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            const requestObj = res.data;
-            request.updateState(requestObj["state"]);
-            console.log(requestObj);
-          } else {
-            console.log("发送失败");
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    },
-    denyTheRequest(index) {
-      const request = this.requestList[index];
-      this.axios
-        .put("api/requests", {
-          params: {
-            option: "01",
-            request_id: request.uuid,
-            state: 0,
-            time: this.date.toLocaleDateString(),
-          },
+          option: "01",
+          request_id: request.uid,
+          state: state,
+          time: this.date.toLocaleDateString(),
         })
         .then((res) => {
           if (res.status === 200) {

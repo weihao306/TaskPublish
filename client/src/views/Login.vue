@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import qs from "qs";
 export default {
   name: "Login",
   data: () => ({
@@ -97,15 +98,17 @@ export default {
     },
     error: false,
     submitStyle: "",
-    loginBtn:{
-      color:'black',
-      outlined:true
-    }
+    loginBtn: {
+      color: "black",
+      outlined: true,
+    },
   }),
   methods: {
     postLogin: function () {
       this.axios
-        .post("api/user/login", this.userInfo)
+        .post("api/user/login", qs.stringify(this.userInfo), {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        })
         .then((res) => {
           // respone the userInfo
           const userInfo = res.data;
@@ -120,7 +123,7 @@ export default {
               this.$store.dispatch("loginAction", userInfo).then(() => {
                 this.$router.push({
                   name: "UserInfo",
-                  params: { uuid: userInfo.uuid },
+                  params: { uid: userInfo.uid },
                 });
               });
             }
