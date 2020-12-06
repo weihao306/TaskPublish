@@ -37,8 +37,8 @@ Vue.config.productionTip = false;
 
 // Vue.use(ElementUI);
 Vue.use(vuetify);
-Vue.use(router);
 Vue.use(store);
+Vue.use(router);
 Vue.use(VueAxios, axios);
 Vue.use(VueCsrf);
 

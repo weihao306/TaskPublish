@@ -26,7 +26,7 @@ import User from "@/classes/User.js";
 export default new Vuex.Store({
   state: {
     isAuth: JSON.parse(localStorage.getItem('isAuth')),
-    userInfo: JSON.parse(localStorage.getItem('userInfo')), // new User()
+    userInfo: new User(JSON.parse(localStorage.getItem('userInfo'))), // new User()
     orders:JSON.parse(localStorage.getItem('orders')),
     requests:JSON.parse(localStorage.getItem('requests'))
   },
@@ -41,7 +41,11 @@ export default new Vuex.Store({
       localStorage.setItem('isAuth', JSON.stringify(setState))
     },
     saveUserInfo(state, userlikeObj) {
-      state.userInfo = new User(userlikeObj);
+      if(userlikeObj instanceof User){
+        state.userInfo = userlikeObj;
+      }else{
+        state.userInfo = new User(userlikeObj);
+      }
       localStorage.setItem('userInfo', JSON.stringify(state.userInfo))
     },
     deleteUserInfo(state) {
@@ -72,7 +76,6 @@ export default new Vuex.Store({
       commit("userStatus", false)
       commit("deleteUserInfo")
     },
-
 
   },
   modules: {}

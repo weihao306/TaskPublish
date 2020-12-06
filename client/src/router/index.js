@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from "../store";
 // import {
 //   component
 // } from 'vue/types/umd'
@@ -63,11 +64,8 @@ const mainViews = [{
   {
     path: 'User/:uid',
     name: 'UserInfo',
-    props: true,
-    params: {
-      uid: String
-    },
     component: () => import('../views/User/Info.vue'),
+    props:true,
     meta: {
       requireAuth: true
     }
@@ -77,8 +75,11 @@ const mainViews = [{
 const routes = [{
     path: '/',
     redirect: {
-      name: 'UserInfo'
-    }
+      name: 'UserInfo',
+      params:{
+        uid:store.state.userInfo.uid
+      }
+    },
   },
   {
     path: '/',
@@ -107,12 +108,15 @@ const routes = [{
     name: 'Register',
     component: () => import('../views/Register.vue')
   },
-  // {
-  //   path: '*',
-  //   redirect: {
-  //     name: 'UserInfo'
-  //   }
-  // },
+  {
+    path: '*',
+    redirect: {
+      name: 'UserInfo',
+      params: {
+        uid: store.state.userInfo.uid
+      }
+    }
+  },
 ]
 
 const router = new VueRouter({

@@ -55,17 +55,19 @@
 
             <v-flex xs11 sm9 md7>
               <v-checkbox
-                :value="!userInfo.cert_type"
+                v-model="trueValue"
                 label="二代身份证"
                 v-show="!userInfo.cert_type"
                 readonly
+                required
               ></v-checkbox>
 
               <v-checkbox
-                :value="userInfo.cert_type"
+                v-model="trueValue"
                 label="护照"
                 v-show="userInfo.cert_type"
                 readonly
+                required
               ></v-checkbox>
 
               <v-text-field
@@ -88,7 +90,6 @@
                       v-on="on"
                       dark
                       @click.native.stop="
-                        modifyInfoSwitcher = true;
                         modifyInfoInit(userInfo);
                       "
                     >
@@ -192,17 +193,17 @@ export default {
   // },
   mounted() {
     // console.log(this.$props.uid);
-    console.log(this.$store.state.userInfo.nick_name);
-    console.log(this.$store.state.userInfo.uid);
-    console.log(this.$props.uid);
-    this.getUserInfo();
+    // this.userInfo = this.$store.state.userInfo;
+    // this.getUserInfo();
   },
-  props: {
-    uid: Number,
+  props:{
+    uid:String
   },
   data() {
     return {
       modifyInfoSwitcher: false,
+      trueValue:true,
+      userInfo:this.$store.state.userInfo,
       // userInfo: {
       //   uid:undefined,
       //   nick_name:undefined,
@@ -212,7 +213,7 @@ export default {
       //   cert_type:undefined,
       //   cert_number:undefined,
       // }, // User class
-      userInfo: new User(),
+      // userInfo: new User(),
       modifyInfo: {
         password: undefined,
         repeatPassword: undefined,
@@ -225,7 +226,7 @@ export default {
   methods: {
     getUserInfo() {
       this.axios
-        .get("api/user/info", {params: {uid: this.$store.state.userInfo.uid }})
+        .get("api/user/info", {params: {uid: this.userInfo.uid }})
         .then((res) => {
           const info = res.data;
           this.userInfo = new User(info);
@@ -244,8 +245,10 @@ export default {
           .then((res) => {
             if (res.status === 200) {
               alert("修改信息成功");
-              modifyInfoSwitcher = false;
-              this.userInfo.updateInfo(this.modifyInfo);
+              // let newUser = new User(this.userInfo);
+              if(this.userInfo instanceof User){
+                this.userInfo.updateInfo(this.modifyInfo);
+              }
               this.$store.commit("saveUserInfo", this.userInfo);
             }
           });

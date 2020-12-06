@@ -30,14 +30,14 @@ module.exports = {
         // 目标 API 地址
         // target: "https://11f3944d-a24c-4d9e-a922-b061437033c2.mock.pstmn.io/", // 接口的域名
         // target: "http://rap2api.taobao.org/app/mock/271997/",
-        target: "http://localhost:5000",
+        target: "http://127.0.0.1:5000",
         // target: "https://yapi.baidu.com/mock/17108/",
         // port:38080,
         // 将主机标头的原点更改为目标URL
-        changeOrigin: false,
+        changeOrigin: true,
         // ws:true,
         pathRewrite: {
-          "^/api/": ""
+          "^/api": ""
         },
       },
       // "/": {
@@ -71,7 +71,8 @@ module.exports = {
     }
   },
 
-  assetsDir: 'static'
+  assetsDir: 'static',
+  productionSourceMap: false
 }
 
 

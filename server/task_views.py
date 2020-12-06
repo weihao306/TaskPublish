@@ -20,8 +20,10 @@ def manage_task(request):
         body = request.GET
         if body.get('all', None) != None:
             return all_task(request)
-        else:
-            return query_task(request)
+        elif body.get('master_id', None) != None:
+            return query_master_task(request)
+        # else:
+        #     return query_slave_task(request)
     elif request.method == 'POST':
         return create_task(request)
     elif request.method == 'DELETE':
@@ -43,7 +45,7 @@ def all_task(request):
 
 @csrf_exempt
 @transaction.atomic
-def query_task(request):
+def query_master_task(request):
     """
     令主查询自己所有的召集令信息
     """
@@ -52,6 +54,25 @@ def query_task(request):
     master = body.get('master_id', '')
     try:
         task = list(Task.objects.values().filter(master__exact=master))
+    except Exception as e:
+        return json_response(200001, 'Task Not Found', {'error': str(e)})
+    else:
+        # data = serializers.serialize(
+        #     'json', task, fields=('master', 'updated_at'))
+        return json_response(200, 'OK', task)
+
+
+@csrf_exempt
+@transaction.atomic
+def query_slave_task(request):
+    """
+    令主查询自己所有的召集令信息
+    """
+    # body = json.loads(request.body)
+    body = request.GET
+    slave = body.get('slave_id', '')
+    try:
+        task = list(Task.objects.values().filter(master__exact=slave))
     except Exception as e:
         return json_response(200001, 'Task Not Found', {'error': str(e)})
     else:
@@ -97,7 +118,7 @@ def create_task(request):
             photo=photo,
         )
         try:
-            task = Task.objects.filter(master__exact=master, created_at__exact=created_at, end_time__exact=end_time,
+            task = Task.objects.filter(master__exact=master, start_time__exact=start_time, end_time__exact=end_time,
                                        max_people__exact=max_people).values()
         except Exception as e:
             return json_response(200002, 'Task Create Error', {'error': str(e)})

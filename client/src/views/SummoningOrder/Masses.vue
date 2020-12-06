@@ -262,32 +262,34 @@ export default {
     };
   },
   mounted() {
-    for (let i = 0; i < 10; i++) {
-      this.orderList.push(
-        new Order({
-          uid: 111,
-          name: "test " + i,
-          info:
-            "testingjdialsjdialshdhaisdsahjnikdsahjikdjhasjdlasjildjalinljdiasildaskjdialsjdiajdaslijdajdlikjislajdilajlik",
-          currentSummonginCount: 1,
-          maximumSummonginCount: 32,
-          status: 0,
-        })
-      );
-    }
-
+    // for (let i = 0; i < 10; i++) {
+    //   this.orderList.push(
+    //     new Order({
+    //       uid: 111,
+    //       name: "test " + i,
+    //       info:
+    //         "testingjdialsjdialshdhaisdsahjnikdsahjikdjhasjdlasjildjalinljdiasildaskjdialsjdiajdaslijdajdlikjislajdilajlik",
+    //       currentSummonginCount: 1,
+    //       maximumSummonginCount: 32,
+    //       status: 0,
+    //     })
+    //   );
+    // }
+    // this.getOrderList();
     this.getRequestList(this.$store.state.userInfo.uid);
   },
   methods: {
     getOrderList() {
-      this.axios.get("api/tasks", { params: { all: true } }).then((res) => {
-        const data = res.data;
-        for (let each of data) {
-          let newOrder = new Order(each);
-          this.orderList.push(newOrder);
-          newOrder = null;
-        }
-      });
+      this.axios
+        .get("api/tasks", { params: { slave_id: this.$store.state.uid } })
+        .then((res) => {
+          const data = res.data;
+          for (let each of data) {
+            let newOrder = new Order(each);
+            this.orderList.push(newOrder);
+            newOrder = null;
+          }
+        });
     },
     getRequestList(slave_id) {
       this.axios

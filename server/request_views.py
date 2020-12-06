@@ -81,6 +81,7 @@ def master_update(request):
         return json_response(200, 'OK', data)
 
 
+@csrf_exempt
 @transaction.atomic  # 数据库操作失败回滚
 def task_success(rid, time):
     """
@@ -107,6 +108,7 @@ def task_success(rid, time):
         add_income(rid, time)
 
 
+@csrf_exempt
 @transaction.atomic  # 数据库操作失败回滚
 def add_income(rid, time):
     """
@@ -156,6 +158,7 @@ def slave_create(request):
         return json_response(200, 'OK', serializers.serialize('json', data))
 
 
+@csrf_exempt
 @transaction.atomic
 def slave_modify(request):
     """

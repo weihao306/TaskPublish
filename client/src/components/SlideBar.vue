@@ -18,7 +18,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              {{User.nick_name}}
+              {{ User.nick_name }}
             </v-list-item-title>
           </v-list-item-content>
           <!-- <v-btn v-show="(User===undefined)"> 登录 </v-btn> -->
@@ -27,10 +27,13 @@
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </v-list-item>
-        <v-list-item>
-          <v-list-content>
-            {{User.introduction}}
-          </v-list-content>
+        <v-list-item three-line>
+          <v-list-item-content>
+            <v-list-item-subtitle>
+            <!-- <div class="col-12 text-truncate"> -->
+              {{ User.introduction }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
         </v-list-item>
 
         <v-list-item v-if="UserID" link>
@@ -40,6 +43,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+
 
       <v-divider />
       <v-divider />
@@ -118,11 +122,10 @@ export default {
     // User:Object
   },
   data() {
-    return {
-    };
+    return {};
   },
-  computed:{
-    User:()=>this.$store.state.userInfo
+  computed: {
+    User: (vm) => vm.$store.state.userInfo,
   },
   watch: {
     SlideBarToggle: function (val) {
