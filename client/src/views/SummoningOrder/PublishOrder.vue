@@ -131,7 +131,6 @@
                 full-width
                 @change="getPhotoUrls(uploadPhotos)"
                 clearable
-                
                 clear-icon="mdi-close-thick"
               >
               </v-file-input>
@@ -225,37 +224,38 @@ export default {
     },
     publishNewOrder() {
       this.axios
-        .post("api/tasks", {
-          params: {
-            master_id: this.$store.state.userInfo.uuid,
-            task_type: this.publishOrderInfo.type,
-            task_name: this.publishOrderInfo.name,
-            description: this.publishOrderInfo.info,
-            cur_people: this.publishOrderInfo.currentSummoningCount,
-            max_people: this.publishOrderInfo.maximumSummoningCount,
-            start_time: new Date().toLocaleDateString(),
-            end_time: this.publishOrderInfo.date,
-            task_status: this.publishOrderInfo.status,
-            photos: this.publishOrderInfo.photos,
-          },
+        .post("api/tasks",{
+          master_id: this.$store.state.userInfo.uid,
+          task_type: this.publishOrderInfo.type,
+          task_name: this.publishOrderInfo.name,
+          description: this.publishOrderInfo.info,
+          cur_people: this.publishOrderInfo.currentSummoningCount,
+          max_people: this.publishOrderInfo.maximumSummoningCount,
+          start_time: new Date().toLocaleDateString(),
+          end_time: this.publishOrderInfo.date,
+          task_status: this.publishOrderInfo.status,
+          photos: this.publishOrderInfo.photos,
         })
         .then((res) => {
-          console.log(res);
+          if (res.status === 200) {
+            alert("发布成功");
+            console.log(res);
+          }
         })
         .catch((err) => {
           console.error(err);
         });
     },
   },
-  watch:{
-    uploadPhotos(){
-      if(this.uploadPhotos.length === 0){
-        while(this.imgs.length!==0){
+  watch: {
+    uploadPhotos() {
+      if (this.uploadPhotos.length === 0) {
+        while (this.imgs.length !== 0) {
           this.imgs.pop();
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

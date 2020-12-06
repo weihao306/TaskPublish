@@ -9,3 +9,8 @@
 client/dist
 client/node_modules
 client/dist/*
+.project
+config/__pycache__
+server/__pycache__
+utils/__pycache__
+server/migrations/__pycache__
