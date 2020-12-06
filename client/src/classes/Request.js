@@ -1,20 +1,17 @@
 class Request{
-    uid = undefined;
+    uuid = undefined;
     name = undefined;
     msg = undefined;
     state = undefined;
-    task_id =undefined;
     order_id = undefined;
-    slave_id = undefined;
-    requesterName = undefined;
+    requestUserName = undefined;
     constructor(args) {
-        this.uid = args['uid'];
-        this.name = args['name'];
-        this.msg = args['description'];
-        this.state = args['request_status'];
-        this.order_id = args['task'];
-        this.requesterName = args['requesterName'];
-        this.slave_id = args['requester'];
+        this.uuid = args.request_id;
+        this.name = args.name;
+        this.msg = args.msg;
+        this.state = args.state;
+        this.order_id = args.order_id;
+        this.requestUserName = args.requestUserName;
     };
     updateState(state){
         this.state = state;

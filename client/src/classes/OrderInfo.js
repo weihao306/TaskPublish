@@ -1,24 +1,24 @@
 class OrderInfo {
-    uid = undefined;
+    uuid = undefined;
     name = undefined;
     info = undefined;
     currentSummoningCount = undefined;
     maximumSummoningCount = undefined;
     status = undefined;
     date = undefined;
-    master_id = undefined;
+    master_uuid = undefined;
     type = undefined;
     photos = [];
     constructor(args) {
         if (args instanceof Object) {
-            this.uid = args['uid']
+            this.uuid = args['uuid']
             this.name = args['name'];
             this.info = args['info'];
             this.currentSummoningCount = args['currentSummoningCount'];
             this.maximumSummoningCount = args['maximumSummoningCount'];
             this.status = args['status'];
             this.date = args['date'];
-            this.master_id = args['master_id'];
+            this.master_uuid = args['master_uuid'];
             this.type = args['type'];
             this.photos = args['photos'];
         }

@@ -1,6 +1,5 @@
 class Order {
-    uid = undefined;
-    master_id = undefined;
+    uuid = undefined;
     name = undefined;
     info = undefined;
     currentSummoningCount = undefined;
@@ -8,34 +7,27 @@ class Order {
     modifyInfo = false;
     deleteInfo = false;
     status = undefined;
-    start_date = undefined;
-    end_date = undefined;
+    date = undefined;
     type = undefined;
-    photos =undefined;
     joinRequests =[{
-        massess_uid:undefined,
+        massess_uuid:undefined,
         request_msg:undefined
     }];
     time = {
         hour:Number,
         minute:Number
     };
-    // uid,name, info, currentSummoningCount, maximumSummoningCount
+    // uuid,name, info, currentSummoningCount, maximumSummoningCount
     constructor(args) {
-        this.uid = args["uid"];
-        this.master_id = args["master"]
-        this.name = args["task_name"];
-        this.info = args["description"];
-        this.currentSummoningCount = args["cur_people"];
-        this.maximumSummoningCount = args["max_people"];
-        this.type = args['task_type'];
-        this.status = args["task_status"];
-        this.end_date = args["end_time"];
-        this.joinRequests = args["joinRequest"];
-    }
-
-    getPhotos(args){
-        this.photos = args["photos"];
+        this.uuid = args["uuid"];
+        this.name = args["name"];
+        this.info = args["info"];
+        this.currentSummoningCount = args["currentSummoningCount"];
+        this.maximumSummoningCount = args["maximumSummoningCount"];
+        this.type = args['type'];
+        this.status = args["status"];
+        this.date = args["date"];
+        this.joinRequests = args["joinRequest"]
     }
 }
 export default Order;

@@ -31,7 +31,7 @@
                   :to="{
                     name: 'SeekOrder',
                     params: {
-                      ordersBeenRequest_uids: ordersBeenRequest_uids,
+                      ordersBeenRequest_uuids: ordersBeenRequest_uuids,
                     },
                   }"
                   >寻找召集令</v-btn
@@ -58,6 +58,7 @@
             class="text-justify text-h5 font-weight-bold pb-1"
           >
             {{ request.name }}
+            
           </v-card-title>
           <v-card-title class="py-1">
             <v-chip
@@ -163,7 +164,7 @@
                     :to="{
                       name: 'OrderInfo',
                       params: {
-                        order_id: order.uid,
+                        order_id: order.uuid,
                         backWardRouteName: 'Masses',
                       },
                     }"
@@ -239,7 +240,7 @@ import Order from "@/classes/Order.js";
 import Request from "@/classes/Request.js";
 export default {
   computed: {
-    ordersBeenRequest_uids: (vm) => [
+    ordersBeenRequest_uuids: (vm) => [
       ...vm.requestList.map((obj) => obj.order_id),
     ],
   },
@@ -251,7 +252,7 @@ export default {
       statusColor: ["warning", "success", "error"],
       joinRequests: [
         {
-          order_uid: undefined,
+          order_uuid: undefined,
           request_msg: undefined,
         },
       ],
@@ -262,38 +263,36 @@ export default {
     };
   },
   mounted() {
-    // for (let i = 0; i < 10; i++) {
-    //   this.orderList.push(
-    //     new Order({
-    //       uid: 111,
-    //       name: "test " + i,
-    //       info:
-    //         "testingjdialsjdialshdhaisdsahjnikdsahjikdjhasjdlasjildjalinljdiasildaskjdialsjdiajdaslijdajdlikjislajdilajlik",
-    //       currentSummonginCount: 1,
-    //       maximumSummonginCount: 32,
-    //       status: 0,
-    //     })
-    //   );
-    // }
-    // this.getOrderList();
-    this.getRequestList(this.$store.state.userInfo.uid);
+    for (let i = 0; i < 10; i++) {
+      this.orderList.push(
+        new Order({
+          uuid: 111,
+          name: "test " + i,
+          info:
+            "testingjdialsjdialshdhaisdsahjnikdsahjikdjhasjdlasjildjalinljdiasildaskjdialsjdiajdaslijdajdlikjislajdilajlik",
+          currentSummonginCount: 1,
+          maximumSummonginCount: 32,
+          status: 0,
+        })
+      );
+    }
+
+    this.getRequestList(this.$store.state.userInfo.uuid);
   },
   methods: {
     getOrderList() {
-      this.axios
-        .get("api/tasks", { params: { slave_id: this.$store.state.uid } })
-        .then((res) => {
-          const data = res.data;
-          for (let each of data) {
-            let newOrder = new Order(each);
-            this.orderList.push(newOrder);
-            newOrder = null;
-          }
-        });
+      this.axios.get("api/tasks").then((res) => {
+        const data = res.data;
+        for (let each of data) {
+          let newOrder = new Order(each);
+          this.orderList.push(newOrder);
+          newOrder = null;
+        }
+      });
     },
     getRequestList(slave_id) {
       this.axios
-        .get("api/requests", {
+          .get("api/requests", {
           params: { option: "12", slave_id: slave_id },
         })
         .then((res) => {
@@ -316,7 +315,9 @@ export default {
     deleteInfoAction(order, index) {
       order.deleteInfo = false;
       this.axios
-        .delete("api/tasks", { uid: order.uid })
+        .delete("api/tasks", {
+          params: { uuid: order.uuid },
+        })
         .then((res) => {
           this.orderList.splice(index, 1);
         })
@@ -327,9 +328,11 @@ export default {
     modifyRequestAction(request) {
       this.axios
         .put("api/requests", {
-          option: "11",
-          request_id: request.uid,
-          request_msg: request.msg,
+          params: {
+            option: "11",
+            request_id: request.uuid,
+            request_msg: request.msg,
+          },
         })
         .then((res) => {
           if (res.status === 200) {

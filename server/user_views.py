@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt  # 引入防跨站请求伪
 
 from server.models import Profile  # 引入Profile数据模型
 from utils.response import json_response  # 引入响应对象
-# from django.http import JsonResponse
+
 
 # Create your views here.
 
@@ -24,10 +24,10 @@ def register(request):
     password = body.get('password', '')     # 获取密码
     city = body.get('city', '')             # 获取城市
     introduction = body.get('introduction', '')     # 获取用户简介
-    cert_type = body.get('cert_type', 0)           # 证件类型
+    cert_type = body.get('cert_type', '')           # 证件类型
     cert_number = body.get('cert_number', '')       # 证件号
     phone = body.get('telephone', 0)        # 电话号码
-    name = body.get('nick_name', '')             # 姓名
+    name = body.get('name', '')             # 姓名
 
     try:
         p = Profile.objects.get(account=account)
@@ -45,10 +45,10 @@ def register(request):
             user_level=0,
         )
         return json_response(200, 'OK', {  # 返回用户uid
-            'uid': Profile.objects.values().get(account=account).get('uid')
+            'uid': Profile.objects.get(account=account).value().get('uid')
         })
     else:
-        return json_response(300003, 'User Has Existed', {'error':True})
+        return json_response(300003, 'User Has Existed', {})
 
 
 @csrf_exempt
@@ -69,50 +69,36 @@ def login(request):
         if p.get('password') != password:
             return json_response(300002, 'Password Error', {})
         else:
-            return json_response(200,"OK",{
-                    'uid':p.get('uid'),
-                    'nick_name':p.get('user_name'),
-                    'account': p.get('account'),
-                    'introduction': p.get('introduction'),
-                    'telephone': p.get('phone'),
-                    'cert_type': p.get('cert_type'),
-                    'cert_number': p.get('cert_number')
-                    })
+            return json_response((200, 'OK', {
+                'uid': p.get('uid')
+            }))
 
 
-@csrf_exempt
 def info(request):
     """
     用户信息管理
     """
     if request.method == 'GET':
-        return get_info(request)
+        get_info(request)
     elif request.method == 'PUT':
-        return update_info(request)
+        update_info(request)
 
 
+@csrf_exempt
 @transaction.atomic
 def get_info(request):
     """
     查询用户信息
     """
-    # body = json.loads(request.body)
-    body = request.GET
+    body = json.loads(request.body)
     uid = body.get('uid', '')  # 获取用户uid
     try:
-        p = Profile.objects.values().get(uid=uid)
+        p = Profile.objects.get(uid=uid).value()
     except Profile.DoesNotExist:
         return json_response(300001, 'User Not Found', {})
     else:
-        return json_response(200, "OK", {
-            'uid': p.get('uid'),
-            'nick_name': p.get('user_name'),
-            'account': p.get('account'),
-            'introduction': p.get('introduction'),
-            'telephone': p.get('phone'),
-            'cert_type': p.get('cert_type'),
-            'cert_number': p.get('cert_number')
-        })
+        return json_response(200, 'OK', serializers.serialize('json', p))
+
 
 @transaction.atomic
 def update_info(request):
@@ -120,9 +106,8 @@ def update_info(request):
     修改用户信息
     """
     body = json.loads(request.body)
-    # body = request.GET
     try:
-        uid = body.get('uid', '')
+        uid = body.get('uuid', '')
         p = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:
         return json_response(300001, 'User Not Found', {})
@@ -130,6 +115,6 @@ def update_info(request):
         p.password = body.get('password', '')
         p.phone = body.get('telephone', '')
         p.introduction = body.get('introduction', '')
-        p.user_name = body.get('nick_name', '')
+        p.user_name = body.get('nickname', '')
         p.save()
         return json_response(200, 'OK', {})

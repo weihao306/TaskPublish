@@ -1,14 +1,13 @@
 class User {
-    uid;
+    uuid;
     nick_name;
     account;
     password;
     introduction;
-    telephone;
     cert_type;
     cert_number;
     // constructor(){
-    //     uid = undefined;
+    //     uuid = undefined;
     //     nick_name = undefined;
     //     account = undefined;
     //     password = undefined;
@@ -18,18 +17,18 @@ class User {
     // };
     constructor(args) {
         if (args instanceof Object) {
-            this.uid = args.uid;
-            this.nick_name = args.nick_name?args.nick_name:"";
+            this.uuid = args.uuid;
+            this.nick_name = args.nick_name;
             this.account = args.account;
-            // this.password = args.password?args.password:"";
-            this.introduction = args.introduction?args.introduction:"";
+            this.password = args.password;
+            this.introduction = args.introduction;
             this.telephone = args.telephone;
             this.cert_type = args.cert_type;
             this.cert_number = args.cert_number;
         }
     };
-    set_uid(uid) {
-        this.uid = uid;
+    set_uuid(uuid) {
+        this.uuid = uuid;
     }
     set_nick_name(nick_name) {
         this.nick_name = nick_name;
@@ -54,7 +53,7 @@ class User {
      *     }
      */
     updateInfo(obj) {
-        this.set_nick_name(obj.nick_name);
+        // this.set_nick_name(obj.nick_name);
         this.set_password(obj.password);
         this.set_telephone(obj.telephone);
         this.set_introduction(obj.introduction);

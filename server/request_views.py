@@ -13,26 +13,22 @@ import json
 from utils.timeformat import format_date  # 格式化时间字符串
 
 
-@csrf_exempt  # POST表单防止跨站请求伪造
 def manage_request(request):
     """
     令主请求管理模块
     """
-    # body = json.loads(request.body)
-    body = request.GET
-    if body is "":
-        body = json.loads(request.body)
+    body = json.loads(request.body)
     option = body.get('option', '')
     if option == '00':
-        return master_query(request)
+        master_query(request)
     elif option == '01':
-        return master_update(request)
+        master_update(request)
     elif option == '10':
-        return slave_create(request)
+        slave_create(request)
     elif option == '11':
-        return slave_modify(request)
+        slave_modify(request)
     elif option == '12':
-        return slave_query(request)
+        slave_query(request)
 
 
 @csrf_exempt  # POST表单防止跨站请求伪造
@@ -41,11 +37,10 @@ def master_query(request):
     """
     查询请求信息
     """
-    # body = json.loads(request.body)
-    body = request.GET
+    body = json.loads(request.body)
     task = body.get('order_id', '')
     try:
-        req = list(Request.objects.values().filter(task__exact=task))
+        req = Request.objects.filter(task__exact=task).values()
     except Request.DoesNotExist:
         return json_response(400001, 'Request Not Found', {})
     else:
@@ -59,10 +54,9 @@ def master_update(request):
     更新召集令请求状态
     """
     body = json.loads(request.body)
-    # body = request.GET
     rid = body.get('request_id', '')
     time = body.get('time', '')
-    status = body.get('state',None)
+    status = body.get('state')
 
     if status == 'accepted':
         status = 1
@@ -71,17 +65,16 @@ def master_update(request):
         status = 2
 
     try:
-        req = Request.objects.get(uid=rid)
+        req = Request.objects.filter(uid__exact=rid)
         req.request_status = status
         req.save()
     except Exception as e:
         return json_response(400002, 'Accept Request Error', {'error': str(e)})
     else:
-        data = Request.objects.values().get(uid=rid)
-        return json_response(200, 'OK', data)
+        data = Request.objects.filter(uid__exact=rid)
+        return json_response(200, 'OK', serializers.serialize('json', data))
 
 
-@csrf_exempt
 @transaction.atomic  # 数据库操作失败回滚
 def task_success(rid, time):
     """
@@ -108,7 +101,6 @@ def task_success(rid, time):
         add_income(rid, time)
 
 
-@csrf_exempt
 @transaction.atomic  # 数据库操作失败回滚
 def add_income(rid, time):
     """
@@ -158,14 +150,12 @@ def slave_create(request):
         return json_response(200, 'OK', serializers.serialize('json', data))
 
 
-@csrf_exempt
 @transaction.atomic
 def slave_modify(request):
     """
     接令者修改申请信息
     """
     body = json.loads(request.body)
-    # body = request.GET
     req = body.get('request_id', '')
     msg = body.get('request_msg', '')
 
@@ -182,15 +172,14 @@ def slave_query(request):
     """
     接令人查询已经接受的召集令请求
     """
-    # body = json.loads(request.body)
-    body = request.GET
-    slave = body.get('slave_id', '')
+    body = json.loads(request.body)
+    slave = body.get('slave_uuid', '')
     try:
-        task = list(Request.objects.values().filter(requester__exact=slave, request_status__exact=1))
+        task = Request.objects.filter(requester__exact=slave, request_status__exact=1).values()
     except Exception as e:
         return json_response(400005, 'Slave Query Error', {'error': str(e)})
     else:
-        return json_response(200, 'OK', task)
+        return json_response(200, 'OK', serializers.serialize('json', task))
 
 
 @transaction.atomic
@@ -199,7 +188,6 @@ def slave_delete(request):
     接令人删除为同意的召集令请求
     """
     body = json.loads(request.body)
-    # body = request.GET
     req = body.get('request_id', '')
     try:
         Request.objects.filter(uid__exact=req, request_status__exact=0).delete()

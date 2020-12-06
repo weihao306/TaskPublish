@@ -4,15 +4,15 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 // class User{
-//   uid;
+//   uuid;
 //   nickName;
 //   account;
 //   password;
 //   introduction;
 //   cert_type;
 //   cert_number;
-//   constructor(uid,nickName,account,password,introduction,cert_type,cert_number) {
-//     this.uid = uid;
+//   constructor(uuid,nickName,account,password,introduction,cert_type,cert_number) {
+//     this.uuid = uuid;
 //     this.nickName = nickName;
 //     this.account = account;
 //     this.password = password;
@@ -26,7 +26,7 @@ import User from "@/classes/User.js";
 export default new Vuex.Store({
   state: {
     isAuth: JSON.parse(localStorage.getItem('isAuth')),
-    userInfo: new User(JSON.parse(localStorage.getItem('userInfo'))), // new User()
+    userInfo: JSON.parse(localStorage.getItem('userInfo')), // new User()
     orders:JSON.parse(localStorage.getItem('orders')),
     requests:JSON.parse(localStorage.getItem('requests'))
   },
@@ -41,11 +41,7 @@ export default new Vuex.Store({
       localStorage.setItem('isAuth', JSON.stringify(setState))
     },
     saveUserInfo(state, userlikeObj) {
-      if(userlikeObj instanceof User){
-        state.userInfo = userlikeObj;
-      }else{
-        state.userInfo = new User(userlikeObj);
-      }
+      state.userInfo = new User(userlikeObj);
       localStorage.setItem('userInfo', JSON.stringify(state.userInfo))
     },
     deleteUserInfo(state) {
@@ -76,6 +72,7 @@ export default new Vuex.Store({
       commit("userStatus", false)
       commit("deleteUserInfo")
     },
+
 
   },
   modules: {}

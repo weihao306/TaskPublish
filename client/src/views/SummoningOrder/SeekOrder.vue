@@ -41,11 +41,7 @@
                     order.maximumSummoningCount
                   }}</v-chip
                 >
-                <v-chip
-                  label
-                  :color="color[order.type % color.length]"
-                  class="align-self-center"
-                >
+                <v-chip label :color="color[order.type % color.length]" class="align-self-center">
                   {{ selectOptions[order.type].text }}
                 </v-chip>
 
@@ -55,7 +51,7 @@
                   :to="{
                     name: 'OrderInfo',
                     params: {
-                      order_id: order.uid,
+                      order_id: order.uuid,
                       backWardRouteName: 'SeekOrder',
                     },
                   }"
@@ -83,7 +79,7 @@
                   v-bind="attrs"
                   v-on="on"
                   color="primary"
-                  v-if="ordersBeenRequest_uids.includes(order.uid)"
+                  v-if="ordersBeenRequest_uuids.includes(order.uuid)"
                   >{{ "申请加入" }}</v-btn
                 >
               </template>
@@ -120,7 +116,7 @@
             <v-chip
               color="grey"
               label
-              v-if="!ordersBeenRequest_uids.includes(order.uid)"
+              v-if="!ordersBeenRequest_uuids.includes(order.uuid)"
               >{{ "已申请" }}</v-chip
             >
           </v-card-title>
@@ -134,21 +130,21 @@
 import Order from "@/classes/Order.js";
 export default {
   // beforeUpdate(){
-  //   localStorage.setItem('ordersBeenRequest_uids',JSON.parse(this.ordersBeenRequest_uids));
+  //   localStorage.setItem('ordersBeenRequest_uuids',JSON.parse(this.ordersBeenRequest_uuids));
   // },
   watch: {},
   mounted() {
     // window.onbeforeunload = (e) => {
     //   localStorage.setItem(
-    //     "ordersBeenRequest_uids",
-    //     JSON.parse(this.ordersBeenRequest_uids)
+    //     "ordersBeenRequest_uuids",
+    //     JSON.parse(this.ordersBeenRequest_uuids)
     //   );
     // };
-    // console.log(this.$store.state.requests.map(el => el.uid));
+    // console.log(this.$store.state.requests.map(el => el.uuid));
     this.getAllOrder();
-    // if (this.ordersBeenRequest_uids === undefined) {
-    //   this.ordersBeenRequest_uids = localStorage.getItem(
-    //     "ordersBeenRequest_uids"
+    // if (this.ordersBeenRequest_uuids === undefined) {
+    //   this.ordersBeenRequest_uuids = localStorage.getItem(
+    //     "ordersBeenRequest_uuids"
     //   );
     // }
     // console.log(this.selectedTypeKeys)
@@ -159,7 +155,7 @@ export default {
     //     vm.selectOptions.findIndex((obj) => obj === element);
     //   }),
     // ],
-    ordersBeenRequest_uids: (vm) =>
+    ordersBeenRequest_uuids: (vm) =>
       vm.$store.state.requests.map((el) => el.order_id),
   },
   data() {
@@ -209,10 +205,12 @@ export default {
     requestJoin(order) {
       this.axios
         .post("api/requests", {
-          option: "10",
-          order_id: order.uid,
-          slave_id: this.$store.state.userInfo.uid,
-          request_msg: this.requestMsg,
+          params: {
+            option: "10",
+            order_id: order.uuid,
+            slave_id: this.$store.state.userInfo.uuid,
+            request_msg: this.requestMsg,
+          },
         })
         .then((res) => {
           if (res.status === 200) {

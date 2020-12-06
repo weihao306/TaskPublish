@@ -79,13 +79,13 @@
               <v-flex xs12 md10>
                 <v-checkbox
                   label="二代身份证"
-                  :value="!userInfo.cert_type"
-                  @change="userInfo.cert_type = 0"
+                  :value="userInfo.cert_type==='二代身份证'"
+                  @change="userInfo.cert_type = '二代身份证' "
                 ></v-checkbox>
                 <v-checkbox
                   label="护照"
-                  :value="userInfo.cert_type"
-                  @change="userInfo.cert_type = 1"
+                  :value="userInfo.cert_type ==='护照'"
+                  @change="userInfo.cert_type = '护照' "
                 ></v-checkbox>
                 <v-text-field
                   name="cert_number"

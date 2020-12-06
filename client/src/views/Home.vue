@@ -5,7 +5,7 @@
       :SlideBarToggle="SlideBarToggleState"
       @switchToggle="SlideBarToggleState = $event"
     ></Header>
-    <router-view :uid="this.$store.state.userInfo.uid"></router-view>
+    <router-view></router-view>
     <SlideBar
       :SlideBarToggle="SlideBarToggleState"
       @switchToggle="SlideBarToggleState = $event"

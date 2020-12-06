@@ -3,5 +3,5 @@ from server.request_views import manage_request
 
 
 urlpatterns = [
-    url(r'^', manage_request, name='manage task'),
+    url(r'^$requests', manage_request, name='manage task'),
 ]
