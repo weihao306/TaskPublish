@@ -55,16 +55,19 @@
 
             <v-flex xs11 sm9 md7>
               <v-checkbox
-                v-model="userInfo.cert_type"
+                v-model="trueValue"
                 label="二代身份证"
+                v-show="!userInfo.cert_type"
                 readonly
+                required
               ></v-checkbox>
 
               <v-checkbox
-                :value="!userInfo.cert_type"
+                v-model="trueValue"
                 label="护照"
-                v-show="!userInfo.cert_type"
+                v-show="userInfo.cert_type"
                 readonly
+                required
               ></v-checkbox>
 
               <v-text-field
@@ -87,7 +90,6 @@
                       v-on="on"
                       dark
                       @click.native.stop="
-                        modifyInfoSwitcher = true;
                         modifyInfoInit(userInfo);
                       "
                     >
@@ -96,10 +98,21 @@
                     </v-btn>
                   </template>
                   <v-card>
-                    <v-card-title class="headline grey lighten-2">修改信息</v-card-title>
+                    <v-card-title class="headline grey lighten-2"
+                      >修改信息</v-card-title
+                    >
                     <v-divider></v-divider>
                     <v-card-text>
                       <v-layout row justify-center align-center wrap>
+                        <v-flex xs11 sm9 md7>
+                          <v-text-field
+                            v-model="modifyInfo.nick_name"
+                            name="nick_name"
+                            label="昵称"
+                            type="input"
+                            required
+                          />
+                        </v-flex>
                         <v-flex xs11 sm9 md7>
                           <v-text-field
                             v-model="modifyInfo.password"
@@ -152,7 +165,10 @@
                       <v-spacer></v-spacer>
                       <v-btn
                         color="success"
-                        @click.native="modifyInfoSwitcher=false;confirmModifyInfo();"
+                        @click.native="
+                          modifyInfoSwitcher = false;
+                          confirmModifyInfo();
+                        "
                         >确认修改</v-btn
                       >
                     </v-card-actions>
@@ -171,25 +187,25 @@
 import User from "@/classes/User.js";
 export default {
   // computed(){
-  //   uuid(){
-  //     return this.$store.state.userInfo.uuid;
+  //   uid(){
+  //     return this.$store.state.userInfo.uid;
   //   };
   // },
   mounted() {
-    // console.log(this.$props.uuid);
-    console.log(this.$store.state.userInfo.nick_name);
-    console.log(this.$store.state.userInfo.uuid);
-    console.log(this.$props.uuid)
-    this.getUserInfo();
+    // console.log(this.$props.uid);
+    // this.userInfo = this.$store.state.userInfo;
+    // this.getUserInfo();
   },
-  props: {
-    uuid: Number,
+  props:{
+    uid:String
   },
   data() {
     return {
       modifyInfoSwitcher: false,
+      trueValue:true,
+      userInfo:this.$store.state.userInfo,
       // userInfo: {
-      //   uuid:undefined,
+      //   uid:undefined,
       //   nick_name:undefined,
       //   account:undefined,
       //   password:undefined,
@@ -197,21 +213,20 @@ export default {
       //   cert_type:undefined,
       //   cert_number:undefined,
       // }, // User class
-      userInfo:new User(),
+      // userInfo: new User(),
       modifyInfo: {
         password: undefined,
         repeatPassword: undefined,
         telephone: undefined,
         introduction: undefined,
+        nick_name: undefined,
       },
     };
   },
   methods: {
     getUserInfo() {
       this.axios
-        .get("api/user/info", {
-          params: { uuid: this.$store.state.userInfo.uuid },
-        })
+        .get("api/user/info", {params: {uid: this.userInfo.uid }})
         .then((res) => {
           const info = res.data;
           this.userInfo = new User(info);
@@ -221,17 +236,21 @@ export default {
       if (this.modifyInfo.password == this.modifyInfo.repeatPassword) {
         this.axios
           .put("api/user/info", {
-            params: {
-              uuid: this.uuid,
-              password: this.modifyInfo.password,
-              telephone: this.modifyInfo.telephone,
-              introduction: this.modifyInfo.introduction,
-            },
+            uid: this.$store.state.userInfo.uid,
+            password: this.modifyInfo.password,
+            telephone: this.modifyInfo.telephone,
+            introduction: this.modifyInfo.introduction,
+            nick_name: this.modifyInfo.nick_name,
           })
           .then((res) => {
-            alert("修改信息成功");
-            modifyInfoSwitcher = false;
-            this.userInfo.updateInfo(this.modifyInfo);
+            if (res.status === 200) {
+              alert("修改信息成功");
+              // let newUser = new User(this.userInfo);
+              if(this.userInfo instanceof User){
+                this.userInfo.updateInfo(this.modifyInfo);
+              }
+              this.$store.commit("saveUserInfo", this.userInfo);
+            }
           });
       } else {
         alert("密码必须一致");
@@ -243,6 +262,7 @@ export default {
       this.modifyInfo.repeatPassword = "";
       this.modifyInfo.telephone = userInfo.telephone;
       this.modifyInfo.introduction = userInfo.introduction;
+      this.modifyInfo.nick_name = userInfo.nick_name;
     },
   },
 };

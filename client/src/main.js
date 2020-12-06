@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
 import router from './router'
+// import axios from "./axios";
 // import mock from './mock';
 import vuetify from './plugins/vuetify';
 // import ElementUI from 'element-ui';
@@ -13,18 +14,33 @@ import vuetify from './plugins/vuetify';
 
 import axios from "axios";
 import VueAxios from "vue-axios";
-
+import VueCsrf from "vue-csrf";
 
 
 Vue.config.productionTip = false;
 
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('#token').getAttribute('value');
+// axios.defaults.xsrfCookieName = 'csrftoken'
+// axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
+
+// axios.interceptors.request.use(config => {
+//   const cookies = window.cookies
+//   if (cookies && config.method === 'post') {
+//     config.headers['x-csrftoken'] = cookies.get('csrftoken');
+//   }
+//   return config
+// })
+
 
 // Vue.use(ElementUI);
 Vue.use(vuetify);
-Vue.use(router);
 Vue.use(store);
+Vue.use(router);
 Vue.use(VueAxios, axios);
+Vue.use(VueCsrf);
 
 
 // 登录拦截
