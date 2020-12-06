@@ -224,7 +224,7 @@ export default {
     },
     publishNewOrder() {
       this.axios
-        .post("api/tasks",{
+        .post("api/tasks", {
           master_id: this.$store.state.userInfo.uid,
           task_type: this.publishOrderInfo.type,
           task_name: this.publishOrderInfo.name,
@@ -239,7 +239,7 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             alert("发布成功");
-            console.log(res);
+            this.$router.push({name:'Master'});            
           }
         })
         .catch((err) => {

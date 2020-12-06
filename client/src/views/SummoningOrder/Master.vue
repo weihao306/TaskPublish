@@ -95,8 +95,7 @@
                               <v-card-title
                                 class="text-justify text-h5 font-weight-bold"
                               >
-                                {{ request.name }}
-
+                                申请人:{{ request.requesterName }}
                                 <v-chip
                                   class="mx-2"
                                   ref="orderStatus"
@@ -106,23 +105,23 @@
                                 >
                               </v-card-title>
 
-                              <v-card-text>
-                                <blockquote
-                                  class="text-justify text-h5 font-weight-bold"
-                                >
-                                  申请人:{{ request.requesterName }}
-                                </blockquote>
+                              <v-card-text
+                                class="col-12 text-justify text-h6 font-weight-bold"
+                              >
+                                {{ request.msg }}
                               </v-card-text>
                               <v-card-actions v-show="request.state === 0">
                                 <v-spacer></v-spacer>
                                 <v-btn
                                   color="success"
-                                  @click.stop="acceptTheRequest(index)"
+                                  @click.stop="acceptTheRequest(index);
+                                  order.requestsSwitcher = false;"
                                   >同意</v-btn
                                 >
                                 <v-btn
                                   color="error"
-                                  @click.stop="denyTheRequest(index)"
+                                  @click.stop="denyTheRequest(index);
+                                  order.requestsSwitcher = false;"
                                   >拒绝</v-btn
                                 >
                               </v-card-actions>
@@ -200,7 +199,7 @@
                       dark
                       v-bind="attrs"
                       v-on="on"
-                      @click.stop="modifyOrderInit(order)"
+                      @click="modifyOrderInit(order)"
                     >
                       修改信息
                     </v-btn>
@@ -231,10 +230,34 @@
                             maxlength="20"
                             :rules="[
                               () =>
-                                (!!modify.info && modify.info.length <= 20) ||
-                                '必须不大于20个字',
+                                (!!modify.info && modify.info.length <= 100) ||
+                                '必须不大于100个字',
                             ]"
                           ></v-textarea>
+                        </v-flex>
+                        <v-flex xs11 sm9 md7>
+                          <!-- <v-layout row wrap>
+                              <v-checkbox
+                                v-for="(selection, index) in order_types"
+                                :key="index"
+                                :label="selection.text"
+                                :value="selection.value"
+                                @change="selection.value = 1"
+                              ></v-checkbox>
+                            </v-layout> -->
+
+                          <v-layout row wrap justify-center>
+                            <div class="text-h6">召集令类型</div>
+                          </v-layout>
+
+                          <v-radio-group row v-model="modify.type">
+                            <v-radio
+                              class="my-2"
+                              v-for="(selection, index) of order_types"
+                              :key="index"
+                              :label="selection.text"
+                            ></v-radio>
+                          </v-radio-group>
                         </v-flex>
                       </v-layout>
                     </v-card-text>
@@ -312,15 +335,25 @@ import Request from "@/classes/Request.js";
 export default {
   data() {
     return {
+      trueValue: true,
+      testDate : new Date("2020-12-6"),
       date: new Date(),
       orderList: [],
       requestList: [],
       orderStatus: { 0: "等待召集", 1: "召集中" },
       statusColor: { 0: "warning", 1: "success", 2: "error" },
       requestStatus: { 0: "等待处理", 1: "同意", 2: "拒绝" },
+      order_types: [
+        { text: "技术交流", type: 0, value: false },
+        { text: "学业探讨", type: 1, value: false },
+        { text: "社会实践", type: 2, value: false },
+        { text: "公益志愿者", type: 3, value: false },
+        { text: "游玩", type: 4, value: false },
+      ],
       modify: {
         name: null,
         info: null,
+        type: null,
       },
     };
   },
@@ -378,6 +411,8 @@ export default {
     modifyOrderInit(order) {
       this.modify.name = order.name;
       this.modify.info = order.info;
+      this.modify.type = order.type;
+      this.order_types[order.type].value = true;
     },
     modifyOrderAction(order, putInfo, index) {
       if (putInfo.info.length > 20) {
@@ -389,11 +424,13 @@ export default {
             order_id: order.uid,
             order_name: putInfo.name,
             order_description: putInfo.info,
+            order_type: putInfo.type,
           })
           .then((res) => {
             if (res.status === 200) {
-              order.name = this.modify.name;
-              order.info = this.modify.info;
+              order.name = putInfo.name;
+              order.info = putInfo.info;
+              order.type = putInfo.type;
             }
           })
           .catch((err) => {
@@ -404,7 +441,7 @@ export default {
     deleteInfoAction(order, index) {
       order.deleteInfo = false;
       this.axios
-        .delete("api/tasks", { uid: order.uid })
+        .delete("api/tasks", { params: { order_id: order.uid } })
         .then((res) => {
           if (res.status === 200) {
             this.orderList.splice(index, 1);
@@ -428,14 +465,14 @@ export default {
         .put("api/requests", {
           option: "01",
           request_id: request.uid,
-          state: state,
-          time: this.date.toLocaleDateString(),
+          state: state?"accepted":"denied",
+          time: this.date.toLocaleDateString().split('/').join('-'),
         })
         .then((res) => {
           if (res.status === 200) {
             const requestObj = res.data;
-            request.updateState(requestObj["state"]);
-            console.log(requestObj);
+            request.updateState(state);
+            // console.log(requestObj);
           } else {
             console.log("发送失败");
           }

@@ -30,9 +30,6 @@
                   color="success"
                   :to="{
                     name: 'SeekOrder',
-                    params: {
-                      ordersBeenRequest_uids: ordersBeenRequest_uids,
-                    },
                   }"
                   >寻找召集令</v-btn
                 >
@@ -90,12 +87,7 @@
                   申请信息
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text class="pt-8">
-                  <v-text-field
-                    label="标题"
-                    outlined
-                    v-model="modifyRequest.name"
-                  ></v-text-field>
+                <v-card-text class="pt-12">
                   <v-textarea
                     label="加入理由"
                     outlined
@@ -105,7 +97,7 @@
                 <v-divider></v-divider>
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-btn color="success">提交</v-btn>
+                  <v-btn color="success" @click="modifyRequestAction(request,modifyRequest);request.switcher=false;">提交</v-btn>
                 </v-card-title>
               </v-card>
             </v-dialog>
@@ -238,11 +230,11 @@
 import Order from "@/classes/Order.js";
 import Request from "@/classes/Request.js";
 export default {
-  computed: {
-    ordersBeenRequest_uids: (vm) => [
-      ...vm.requestList.map((obj) => obj.order_id),
-    ],
-  },
+  // computed: {
+  //   ordersBeenRequest_uids: (vm) => [
+  //     ...vm.$store.state.requestList.map((obj) => obj.order_id),
+  //   ],
+  // },
   data() {
     return {
       orderList: [],
@@ -300,6 +292,7 @@ export default {
           if (res.status === 200) {
             const requestListObj = res.data;
             console.log(requestListObj);
+            this.requestList = []
             for (let each of requestListObj) {
               this.requestList.push(new Request(each));
             }
@@ -324,16 +317,21 @@ export default {
           console.error(err);
         });
     },
-    modifyRequestAction(request) {
+    modifyRequestAction(request,putInfo) {
       this.axios
         .put("api/requests", {
           option: "11",
           request_id: request.uid,
-          request_msg: request.msg,
+          request_name:putInfo.name,
+          request_msg: putInfo.msg,
         })
         .then((res) => {
           if (res.status === 200) {
             console.log(res.data);
+            // const newRequestObj = {
+            //   "name":res.data['requester_name'],
+            //   "msg":res.data['description']
+            // }
             const newRequestObj = res.data;
             request.updateMsg(newRequestObj["msg"]);
           }

@@ -1,4 +1,9 @@
-from django.http import QueryDict  # 引入QueryDict模块
+from datetime import date
+from os import name
+from django.db.models.fields import DateField
+from django.http import QueryDict
+# 引入QueryDict模块
+from django.http.response import HttpResponseBadRequest, HttpResponseServerError
 from django.shortcuts import render
 from furl import furl  # 引入furl模块
 from django.db import transaction  # 引入数据库事务模块
@@ -19,20 +24,24 @@ def manage_request(request):
     令主请求管理模块
     """
     # body = json.loads(request.body)
-    body = request.GET
-    if body is "":
+    if request.method == 'GET' or request.method == 'DELETE':
+        body = request.GET
+        option = body.get('option', '')
+        if option == '00':
+            return master_query(request)
+        elif option == '12':
+            return slave_query(request)
+
+    else:
         body = json.loads(request.body)
-    option = body.get('option', '')
-    if option == '00':
-        return master_query(request)
-    elif option == '01':
-        return master_update(request)
-    elif option == '10':
-        return slave_create(request)
-    elif option == '11':
-        return slave_modify(request)
-    elif option == '12':
-        return slave_query(request)
+        option = body.get('option', '')
+        if request.method == 'POST':
+            return slave_create(request)
+        elif request.method == 'PUT':
+            if option == '01':
+                return master_update(request)
+            if option == '11':
+                return slave_modify(request)
 
 
 @csrf_exempt  # POST表单防止跨站请求伪造
@@ -45,11 +54,28 @@ def master_query(request):
     body = request.GET
     task = body.get('order_id', '')
     try:
-        req = list(Request.objects.values().filter(task__exact=task))
+        # req = list(Request.objects.values().filter(task__exact=task))
+
+        req = Request.objects.filter(task__exact=task)
+
+        # slave = list(i.requester for i in req)
+
+        response_body = [{
+            "task_id": each.task.uid,
+            "requester_id": each.requester.uid,
+            "requester_name": each.requester.user_name,
+            "request_status": each.request_status,
+            "uid": each.uid,
+            "description": each.description
+        } for each in req]
+        # slave = list
+        # for i in req:
+        #     slave.append(Profile.objects.values().get(uid=i['uid']))
+
     except Request.DoesNotExist:
         return json_response(400001, 'Request Not Found', {})
     else:
-        return json_response(200, 'OK', serializers.serialize('json', req))
+        return json_response(200, 'OK', response_body)
 
 
 @csrf_exempt  # POST表单防止跨站请求伪造
@@ -62,7 +88,7 @@ def master_update(request):
     # body = request.GET
     rid = body.get('request_id', '')
     time = body.get('time', '')
-    status = body.get('state',None)
+    status = body.get('state', None)
 
     if status == 'accepted':
         status = 1
@@ -72,10 +98,19 @@ def master_update(request):
 
     try:
         req = Request.objects.get(uid=rid)
+
+        task = req.task
+
+        if status == 1 and task.cur_people < task.max_people:
+            task.cur_people += 1
+        elif status != 2:
+            status = 0
+
         req.request_status = status
         req.save()
     except Exception as e:
-        return json_response(400002, 'Accept Request Error', {'error': str(e)})
+        # return json_response(400002, 'Accept Request Error', {'error': str(e)})
+        return HttpResponseServerError
     else:
         data = Request.objects.values().get(uid=rid)
         return json_response(200, 'OK', data)
@@ -87,12 +122,13 @@ def task_success(rid, time):
     """
     召集成功写入数据库
     """
-    req = Request.objects.filter(uid__exact=rid)
+    req = Request.objects.get(uid=rid)
     master = req.task.master
     slave = req.requester
     master_cost = 3
     slave_cost = 1
-    complete_date = req.updated_at
+    # complete_date = req.updated_at
+    # complete_date = time.strftime('%Y-%m-%d')
     try:
         Success.objects.create(
             request=req,
@@ -100,7 +136,7 @@ def task_success(rid, time):
             slave=slave,
             master_cost=master_cost,
             slave_cost=slave_cost,
-            complete_date=time,
+            complete_date= date.fromisoformat(r"%Y-%m-%d"),
         )
     except Exception as e:
         pass
@@ -114,13 +150,14 @@ def add_income(rid, time):
     """
     收入统计
     """
-    date = format_date(time)        # 达成日期
-    req = Request.objects.filter(uid__exact=rid)    # 查询请求
+    # date = format_date(time)        # 达成日期
+    set_date = date.today()         # 达成日期
+    req = Request.objects.get(uid=rid)    # 查询请求
     ttype = req.task.task_type       # 召集令类型
     city = req.task.master.city     # 城市
     cost = 4        # 完成一次召集令请求的收入
     try:
-        inc = Income.objects.filter(task_type=ttype, date=date, city=city)
+        inc = Income.objects.filter(task_type=ttype, date=set_date, city=city)
     except Income.DoesNotExist:
         Income.objects.create(
             task_type=ttype,
@@ -141,21 +178,27 @@ def slave_create(request):
     接令者申请召集令
     """
     body = json.loads(request.body)
-    task = body.get('order_id', '')
-    req = body.get('slave_id', '')
+    tid = body.get('order_id', '')
+    pid = body.get('slave_id', '')
     desc = body.get('request_msg', '')
 
     try:
+        task = Task.objects.get(uid=tid)
+        req = Profile.objects.get(uid=pid)
+        name = req.user_name
         Request.objects.create(
             task=task,
             requester=req,
             description=desc,
+            requester_name=name
         )
     except Exception as e:
-        return json_response(400003, 'Create Request Error', {'error': str(e)})
+        # return json_response(400003, 'Create Request Error', {'error': str(e)})
+        return HttpResponseServerError
     else:
-        data = Request.objects.filter(task__exact=task, requester__exact=req).values()
-        return json_response(200, 'OK', serializers.serialize('json', data))
+        data = Request.objects.values().get(
+            task=tid, requester=pid)
+        return json_response(200, 'OK', data)
 
 
 @csrf_exempt
@@ -168,13 +211,17 @@ def slave_modify(request):
     # body = request.GET
     req = body.get('request_id', '')
     msg = body.get('request_msg', '')
+    name = body.get('request_name')
 
     try:
-        Request.objects.get(uid=req).update(description=msg)
+        r = Request.objects.get(uid=req)
+        r.description = msg
+        r.save()
     except Exception as e:
-        return json_response(400004, 'Modify Request Error', {'error': str(e)})
+        # return json_response(400004, 'Modify Request Error', {'error': str(e)})
+        return HttpResponseBadRequest("Bad Request")
     else:
-        return json_response(200, 'OK', {})
+        return json_response(200, 'OK', {"request_name": name, "msg": msg})
 
 
 @transaction.atomic
@@ -186,9 +233,11 @@ def slave_query(request):
     body = request.GET
     slave = body.get('slave_id', '')
     try:
-        task = list(Request.objects.values().filter(requester__exact=slave, request_status__exact=1))
+        task = list(Request.objects.values().filter(
+            requester__exact=slave))
     except Exception as e:
-        return json_response(400005, 'Slave Query Error', {'error': str(e)})
+        # return json_response(400005, 'Slave Query Error', {'error': str(e)})
+        return HttpResponseServerError
     else:
         return json_response(200, 'OK', task)
 
@@ -202,7 +251,8 @@ def slave_delete(request):
     # body = request.GET
     req = body.get('request_id', '')
     try:
-        Request.objects.filter(uid__exact=req, request_status__exact=0).delete()
+        Request.objects.filter(
+            uid__exact=req, request_status__exact=0).delete()
     except Request.DoesNotExist:
         return json_response(400006, 'Delete Request Not Exist', {})
     else:

@@ -83,7 +83,7 @@
                   v-bind="attrs"
                   v-on="on"
                   color="primary"
-                  v-if="ordersBeenRequest_uids.includes(order.uid)"
+                  v-if="!ordersBeenRequest_uids.includes(order.uid)"
                   >{{ "申请加入" }}</v-btn
                 >
               </template>
@@ -97,7 +97,7 @@
                   <v-textarea
                     label="加入理由"
                     textarea
-                    class=""
+                    class="pt-12"
                     outlined
                     v-model="requestMsg"
                   ></v-textarea>
@@ -120,7 +120,7 @@
             <v-chip
               color="grey"
               label
-              v-if="!ordersBeenRequest_uids.includes(order.uid)"
+              v-show="ordersBeenRequest_uids.includes(order.uid)"
               >{{ "已申请" }}</v-chip
             >
           </v-card-title>
@@ -154,16 +154,12 @@ export default {
     // console.log(this.selectedTypeKeys)
   },
   computed: {
-    // selectedTypeKeys: (vm) => [
-    //   vm.selectedType.forEach((element) => {
-    //     vm.selectOptions.findIndex((obj) => obj === element);
-    //   }),
-    // ],
-    ordersBeenRequest_uids: (vm) =>
-      vm.$store.state.requests.map((el) => el.order_id),
+    
   },
   data() {
     return {
+      ordersBeenRequest_uids: this.$store.state.requests.map((el) => el.order_id),
+
       selectedType: new Array(),
       selectOptions: [
         { text: "技术交流", value: 0 },
@@ -191,7 +187,7 @@ export default {
     getAllOrder() {
       this.axios
         .get("api/tasks", {
-          params: { option: "11", all: true },
+          params: { all: true },
         })
         .then((res) => {
           if (res.status === 200) {
@@ -213,11 +209,14 @@ export default {
           order_id: order.uid,
           slave_id: this.$store.state.userInfo.uid,
           request_msg: this.requestMsg,
+          requester_name: this.$store.state.userInfo.nick_name,
         })
         .then((res) => {
           if (res.status === 200) {
             const requestData = res.data;
-            console.log(requestData);
+            alert("申请成功");
+            this.ordersBeenRequest_uids.push(order.uid);
+            this.$store.commit("appendRequest", requestData);
           }
         })
         .catch((err) => {
