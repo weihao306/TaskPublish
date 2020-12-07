@@ -94,7 +94,7 @@ export default {
     getOrderInfo(order_id) {
       this.axios
         .get("api/tasks", {
-          params: { order_id: order_id },
+          params: { task_id: order_id },
         })
         .then((res) => {
           const orderInfoObj = res.data;

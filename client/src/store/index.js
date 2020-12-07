@@ -23,12 +23,14 @@ Vue.use(Vuex)
 // }
 
 import User from "@/classes/User.js";
+import Order from "@/classes/Order.js";
+import Request from "@/classes/Request.js";
 export default new Vuex.Store({
   state: {
     isAuth: JSON.parse(localStorage.getItem('isAuth')),
     userInfo: new User(JSON.parse(localStorage.getItem('userInfo'))), // new User()
-    orders:JSON.parse(localStorage.getItem('orders')),
-    requests:JSON.parse(localStorage.getItem('requests'))
+    orders: JSON.parse(localStorage.getItem('orders')),
+    requests: JSON.parse(localStorage.getItem('requests'))
   },
   getters: {
     // 转换为bool值
@@ -41,9 +43,9 @@ export default new Vuex.Store({
       localStorage.setItem('isAuth', JSON.stringify(setState))
     },
     saveUserInfo(state, userlikeObj) {
-      if(userlikeObj instanceof User){
+      if (userlikeObj instanceof User) {
         state.userInfo = userlikeObj;
-      }else{
+      } else {
         state.userInfo = new User(userlikeObj);
       }
       localStorage.setItem('userInfo', JSON.stringify(state.userInfo))
@@ -52,14 +54,29 @@ export default new Vuex.Store({
       state.userInfo = null
       localStorage.removeItem('userInfo')
     },
-    saveOrders(state,orderList){
+    saveOrders(state, orderList) {
       state.orders = orderList
       localStorage.setItem('orders', JSON.stringify(state.orders))
     },
-    saveRequests(state,requestList){
+    saveRequests(state, requestList) {
       state.requests = requestList
       localStorage.setItem('requests', JSON.stringify(state.requests))
+    },
+    appendOrder(state, order) {
+      if (order instanceof Order) {
+        state.orders.push(order)
+      } else {
+        state.orders.push(new Order(order))
+      }
+    },
+    appendRequest(state, request) {
+      if (request instanceof Request) {
+        state.requests.push(request)
+      } else {
+        state.requests.push(new Order(request))
+      }
     }
+
   },
   // apply the mutations
   actions: {

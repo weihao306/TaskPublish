@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone
 from django.http import QueryDict
-from django.http.response import Http404  # 引入QueryDict模块
+from django.http.response import Http404, HttpResponseServerError  # 引入QueryDict模块
 from django.shortcuts import render
 from furl import furl  # 引入furl模块
 from django.db import transaction  # 引入数据库事务模块
@@ -22,6 +22,8 @@ def manage_task(request):
             return all_task(request)
         elif body.get('master_id', None) != None:
             return query_master_task(request)
+        elif body.get('task_id',None) !=None:
+            return query_one_task(request)
         # else:
         #     return query_slave_task(request)
     elif request.method == 'POST':
@@ -55,7 +57,28 @@ def query_master_task(request):
     try:
         task = list(Task.objects.values().filter(master__exact=master))
     except Exception as e:
-        return json_response(200001, 'Task Not Found', {'error': str(e)})
+        # return json_response(200001, 'Task Not Found', {'error': str(e)})
+        return HttpResponseServerError
+    else:
+        # data = serializers.serialize(
+        #     'json', task, fields=('master', 'updated_at'))
+        return json_response(200, 'OK', task)
+
+
+@csrf_exempt
+@transaction.atomic
+def query_one_task(request):
+    """
+    查询单独召集令信息
+    """
+    # body = json.loads(request.body)
+    body = request.GET
+    task_id = body.get('task_id', '')
+    try:
+        task = Task.objects.values().get(uid=task_id)
+    except Exception as e:
+        # return json_response(200001, 'Task Not Found', {'error': str(e)})
+        return HttpResponseServerError
     else:
         # data = serializers.serialize(
         #     'json', task, fields=('master', 'updated_at'))
@@ -74,7 +97,8 @@ def query_slave_task(request):
     try:
         task = list(Task.objects.values().filter(master__exact=slave))
     except Exception as e:
-        return json_response(200001, 'Task Not Found', {'error': str(e)})
+        # return json_response(200001, 'Task Not Found', {'error': str(e)})
+        return HttpResponseServerError
     else:
         # data = serializers.serialize(
         #     'json', task, fields=('master', 'updated_at'))
@@ -87,6 +111,8 @@ def create_task(request):
     """
     令主发布召集令
     """
+    a = date.today().strftime('%Y-%m-%d')
+
     body = json.loads(request.body)
     master = body.get('master_id', '')
     task_type = body.get('task_type', None)
@@ -94,9 +120,9 @@ def create_task(request):
     description = body.get('description', '')
     cur_people = body.get('cur_people', 0)
     max_people = body.get('max_people', 0)
-    start_time = body.get('start_time', date.today())
-    end_time = body.get('end_time',date.today())
-    task_status = 1
+   # start_time = body.get('start_time', date.today().strftime('%d-%m-%Y'))
+   #  end_time = body.get('end_time', date.today().strftime('%d-%m-%Y'))
+    task_status = 0
     photo = body.get('photos',None)
 
     try:
@@ -105,25 +131,33 @@ def create_task(request):
         raise Http404
         # json_response(200001, 'User Not Found', {})
     else:
-        Task.objects.create(
-            master=p,
-            task_type=task_type,
-            task_name=task_name,
-            description=description,
-            cur_people=cur_people,
-            max_people=max_people,
-            start_time=start_time,
-            end_time=end_time,
-            task_status=task_status,
-            photo=photo,
-        )
         try:
-            task = Task.objects.filter(master__exact=master, start_time__exact=start_time, end_time__exact=end_time,
-                                       max_people__exact=max_people).values()
-        except Exception as e:
-            return json_response(200002, 'Task Create Error', {'error': str(e)})
+            t = Task.objects.values().get(master=master, task_name=task_name)
+        except Task.DoesNotExist:
+            Task.objects.create(
+                master=p,
+                task_type=task_type,
+                task_name=task_name,
+                description=description,
+                cur_people=cur_people,
+                max_people=max_people,
+                #start_time=start_time,
+                #end_time=end_time,
+                task_status=task_status,
+                photo=photo,
+            )
+            try:
+                # task = Task.objects.filter(master__exact=master, start_time__exact=start_time, end_time__exact=end_time,
+                #                            max_people__exact=max_people).values()
+                task = Task.objects.values().get(master=master, task_name=task_name,
+                                        max_people=max_people)
+            except Exception as e:
+                # return json_response(data={'error': str(e)})
+                return HttpResponseServerError
+            else:
+                return json_response(200, 'OK', task)
         else:
-            return json_response(200, 'OK', serializers.serialize('json', task))
+            return HttpResponseServerError
 
 
 @transaction.atomic
@@ -131,13 +165,14 @@ def delete_task(request):
     """
     令主删除召集令
     """
-    body = json.loads(request.body)
-    # body = request.GET
+    # body = json.loads(request.body)
+    body = request.GET
     try:
         task = body.get('order_id', '')
         Task.objects.get(uid=task).delete()
     except Exception as e:
-        return json_response(200003, 'Task Delete Error', {'error': str(e)})
+        # return json_response(200003, 'Task Delete Error', {'error': str(e)})
+        return HttpResponseServerError
     else:
         return json_response(200, 'OK', {})
 
@@ -151,20 +186,21 @@ def update_task(request):
     # body = request.GET
     try:
         tid = body.get('order_id', '')
-        task = Task.objects.filter(uid__exact=tid)
+        task = Task.objects.get(uid=tid)
     except Task.DoesNotExist:
         return json_response(200001, 'Task Not Found', {})
     else:
         task.task_name = body.get('order_name', '')
-        task.task_type = body.get('order_type', '')
+        task.task_type = body.get('order_type', 0)
         task.description = body.get('order_description', '')
+        task.task_type = body.get('order_type',0)
         if body.get('photo', None) != None:
             task.photo = body.get('photo')
 
         try:
             task.save()
         except Exception as e:
-            return json_response(200004, 'Database Update Error', {'error', str(e)})
+            return Http404
         else:
-            newt = Task.objects.get(uid=tid)
-            return json_response(200, 'OK', serializers.serialize('json', newt))
+            newt = Task.objects.values().get(uid=tid)
+            return json_response(200, 'OK', newt)

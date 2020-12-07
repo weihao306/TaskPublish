@@ -3,7 +3,6 @@ class Request{
     name = undefined;
     msg = undefined;
     state = undefined;
-    task_id =undefined;
     order_id = undefined;
     slave_id = undefined;
     requesterName = undefined;
@@ -12,9 +11,9 @@ class Request{
         this.name = args['name'];
         this.msg = args['description'];
         this.state = args['request_status'];
-        this.order_id = args['task'];
-        this.requesterName = args['requesterName'];
-        this.slave_id = args['requester'];
+        this.order_id = args['task_id'];
+        this.requesterName = args['requester_name'];
+        this.slave_id = args['requester_id'];
     };
     updateState(state){
         this.state = state;
@@ -22,8 +21,17 @@ class Request{
     updateMsg(msg){
         this.msg = msg;
     };
+    updateRequesterName(name){
+        this.requesterName = name;
+    }
     updateTitle(name){
         this.name = name;
     };
+
+    updateInfo(req){
+        this.updateRequesterName(req['requester_name'])
+        this.updateMsg(req['description'])
+    }
+
 }
 export default Request;

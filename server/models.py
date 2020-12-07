@@ -98,8 +98,8 @@ class Task(CreateUpdateMixin):
         (PLAY, u'游玩'),
     )
 
-    FINISHED = 0
-    WAITING = 1
+    WAITING = 0
+    FINISHED = 1
     CANCELLED = 2
     OVERDUE = 3
 
@@ -112,7 +112,7 @@ class Task(CreateUpdateMixin):
 
     uid = models.UUIDField(_(u'召集令标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'召集令唯一标识', db_index=True, unique=True)
-    master = models.OneToOneField(to='Profile', to_field='uid', on_delete=CASCADE, help_text=u'令主',
+    master = models.ForeignKey(to='Profile', to_field='uid', on_delete=CASCADE, help_text=u'令主',
                                   verbose_name=_(u'令主'))
     task_type = models.IntegerField(
         _(u'召集令类型'), default=TECHNICAL, choices=TASK_TYPE, help_text=u'召集令类型')
@@ -160,15 +160,16 @@ class Request(CreateUpdateMixin):
 
     uid = models.UUIDField(_(u'请求标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'请求标识', db_index=True, unique=True)
-    task = models.OneToOneField(
+    task = models.ForeignKey(
         to='Task', to_field='uid', on_delete=CASCADE, verbose_name=u'召集令', help_text=u'召集令')
-    requester = models.OneToOneField(
+    requester = models.ForeignKey(
         to='Profile', to_field='uid', on_delete=CASCADE, verbose_name=u'请求者', help_text=u'请求者')
     description = models.TextField(
         _(u'请求描述'), max_length=200, blank=True, null=True, help_text=u'请求描述')
     request_status = models.IntegerField(
         _(u'请求状态'), default=PENDING, choices=REQUEST_STATUS, help_text=u'请求状态')
-
+    requester_name = models.CharField(
+        _(u'接令人姓名'), max_length=32, blank=True, null=True, help_text=u'接令人姓名')
     def __str__(self):
         return str(self.pk)
 
