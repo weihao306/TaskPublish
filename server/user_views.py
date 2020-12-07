@@ -15,6 +15,7 @@ from utils.response import json_response  # 引入响应对象
 
 # Create your views here.
 
+
 @csrf_exempt  # POST表单防止跨站请求伪造
 @transaction.atomic  # 数据库操作失败回滚
 def register(request):
@@ -51,7 +52,7 @@ def register(request):
             'uid': Profile.objects.values().get(account=account).get('uid')
         })
     else:
-        return json_response(300003, 'User Has Existed', {'error':True})
+        return json_response(300003, 'User Has Existed', {'error': True})
 
 
 @csrf_exempt
@@ -72,15 +73,15 @@ def login(request):
         if p.get('password') != password:
             return HttpResponseBadRequest("密码错误")
         else:
-            return json_response(200,"OK",{
-                    'uid':p.get('uid'),
-                    'nick_name':p.get('user_name'),
-                    'account': p.get('account'),
-                    'introduction': p.get('introduction'),
-                    'telephone': p.get('phone'),
-                    'cert_type': p.get('cert_type'),
-                    'cert_number': p.get('cert_number')
-                    })
+            return json_response(200, "OK", {
+                'uid': p.get('uid'),
+                'nick_name': p.get('user_name'),
+                'account': p.get('account'),
+                'introduction': p.get('introduction'),
+                'telephone': p.get('phone'),
+                'cert_type': p.get('cert_type'),
+                'cert_number': p.get('cert_number')
+            })
 
 
 @csrf_exempt
@@ -117,6 +118,7 @@ def get_info(request):
             'cert_number': p.get('cert_number')
         })
 
+
 @transaction.atomic
 def update_info(request):
     """
@@ -130,9 +132,13 @@ def update_info(request):
     except Profile.DoesNotExist:
         return json_response(300001, 'User Not Found', {})
     else:
-        p.password = body.get('password', '')
-        p.phone = body.get('telephone', '')
-        p.introduction = body.get('introduction', '')
-        p.user_name = body.get('nick_name', '')
+
+        p.password = body.get('password', p.password) if body.get(
+            'password', '') != '' else p.password
+
+        p.phone = body.get('telephone', p.phone)
+        p.introduction = body.get('introduction', p.introduction)
+        p.user_name = body.get('nick_name', p.user_name) if body.get(
+            'nick_name', '') != '' else p.user_name
         p.save()
         return json_response(200, 'OK', {})

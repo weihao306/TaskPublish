@@ -10,7 +10,7 @@
       :SlideBarToggle="SlideBarToggleState"
       @switchToggle="SlideBarToggleState = $event"
       :LogOutPathName="LoginPathName"
-      :list="List"
+      :List="List"
       :User="this.$store.state.userInfo"
     ></SlideBar>
   </v-main>
