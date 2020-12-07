@@ -8,10 +8,10 @@ def format_date(time):
         :return:
         """
     # 如果是时间格式，则转成字符串
-    if type(time) == datetime:
+    if type(time) == date:
         time = time.strftime('%Y%m%d')
     else:
-        time = date.fromisoformat(time)
+        time = date(time)
     # 返回时间格式
     result = datetime.strptime(time, '%Y%m%d')
     return result

@@ -83,7 +83,10 @@
                   v-bind="attrs"
                   v-on="on"
                   color="primary"
-                  v-if="!ordersBeenRequest_uids.includes(order.uid)"
+                  v-show="
+                    !ordersBeenRequest_uids.includes(order.uid) &&
+                    order.currentSummoningCount < order.maximumSummoningCount
+                  "
                   >{{ "申请加入" }}</v-btn
                 >
               </template>
@@ -153,12 +156,12 @@ export default {
     // }
     // console.log(this.selectedTypeKeys)
   },
-  computed: {
-    
-  },
+  computed: {},
   data() {
     return {
-      ordersBeenRequest_uids: this.$store.state.requests.map((el) => el.order_id),
+      ordersBeenRequest_uids: this.$store.state.requests.map(
+        (el) => el.order_id
+      ),
 
       selectedType: new Array(),
       selectOptions: [
@@ -217,6 +220,10 @@ export default {
             alert("申请成功");
             this.ordersBeenRequest_uids.push(order.uid);
             this.$store.commit("appendRequest", requestData);
+          } else if (res.status === 400) {
+            alert("召集人数已满");
+            // alert(res.data.toString());
+            order.currentSummoningCount = order.maximumSummoningCount;
           }
         })
         .catch((err) => {
