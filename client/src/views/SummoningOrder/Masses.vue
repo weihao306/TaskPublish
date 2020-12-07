@@ -47,21 +47,21 @@
         <v-card
           class="mx-auto my-3 elevation-8"
           outlined
-          v-for="request of requestList"
+          v-for="(request,index) of requestList"
           :key="request.key"
         >
           <v-card-title
             primary-title
             class="text-justify text-h5 font-weight-bold pb-1"
           >
-            {{ request.name }}
+            {{ request.order_name }}
           </v-card-title>
           <v-card-title class="py-1">
             <v-chip
-              ref="orderStatus"
+              ref="requestStatus"
               dark
               :color="statusColor[request.state]"
-              >{{ orderStatus[request.state] }}</v-chip
+              >{{ requestStatus[request.state] }}</v-chip
             >
             <v-spacer></v-spacer>
 
@@ -97,7 +97,14 @@
                 <v-divider></v-divider>
                 <v-card-title>
                   <v-spacer></v-spacer>
-                  <v-btn color="success" @click="modifyRequestAction(request,modifyRequest);request.switcher=false;">提交</v-btn>
+                  <v-btn
+                    color="success"
+                    @click="
+                      modifyRequestAction(request, modifyRequest);
+                      request.switcher = false;
+                    "
+                    >提交</v-btn
+                  >
                 </v-card-title>
               </v-card>
             </v-dialog>
@@ -113,6 +120,7 @@
               <v-btn
                 color="error"
                 v-show="request.state === 0 || request.state === 2"
+                @click="deleteRequestAction(request,index)"
                 >撤回</v-btn
               >
             </v-layout>
@@ -141,10 +149,10 @@
               <v-flex xs12>
                 <v-layout row wrap>
                   <v-chip
-                    ref="orderStatus"
+                    ref="requestStatus"
                     dark
                     :color="statusColor[order.status]"
-                    >{{ orderStatus[order.status] }}</v-chip
+                    >{{ requestStatus[order.status] }}</v-chip
                   >
                   <v-spacer></v-spacer>
                   <v-btn
@@ -182,42 +190,6 @@
                 }}</v-chip
               >
               <v-spacer></v-spacer>
-              <!-- <v-dialog
-                v-model="order.deleteInfo"
-                scrollable
-                :overlay="false"
-                transition="dialog-transition"
-                max-width="35rem"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    d-flex
-                    max-width="5rem"
-                    color="error"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                    class="ml-2"
-                  >
-                    退出
-                  </v-btn>
-                </template>
-
-                <v-card>
-                  <v-card-title class="headline grey lighten-2">
-                    确认是否退出 {{ order.name }} 召集令?
-                  </v-card-title>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      color="error"
-                      @click="deleteInfoAction(order, index)"
-                    >
-                      确认
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog> -->
             </v-layout>
           </v-card-text>
         </v-card>
@@ -239,7 +211,9 @@ export default {
     return {
       orderList: [],
       requestList: [],
-      orderStatus: ["等待同意", "响应", "拒绝"],
+      // requestStatus: ["等待同意", "响应", "拒绝"],
+      requestStatus: { 0: "等待同意", 1: "同意", 2: "拒绝" },
+      orderStatus: { 0: "等待召集", 1: "召集中" ,2:"已删除",3:"逾期"},
       statusColor: ["warning", "success", "error"],
       joinRequests: [
         {
@@ -292,7 +266,7 @@ export default {
           if (res.status === 200) {
             const requestListObj = res.data;
             console.log(requestListObj);
-            this.requestList = []
+            this.requestList = [];
             for (let each of requestListObj) {
               this.requestList.push(new Request(each));
             }
@@ -303,10 +277,10 @@ export default {
           console.error(err);
         });
     },
-    modifyInfoAction(order, index) {
+    modifyOrderAction(order, index) {
       order.modifyInfo = false;
     },
-    deleteInfoAction(order, index) {
+    deleteOrderAction(order, index) {
       order.deleteInfo = false;
       this.axios
         .delete("api/tasks", { uid: order.uid })
@@ -317,12 +291,12 @@ export default {
           console.error(err);
         });
     },
-    modifyRequestAction(request,putInfo) {
+    modifyRequestAction(request, putInfo) {
       this.axios
         .put("api/requests", {
           option: "11",
           request_id: request.uid,
-          request_name:putInfo.name,
+          request_name: putInfo.name,
           request_msg: putInfo.msg,
         })
         .then((res) => {
@@ -338,6 +312,21 @@ export default {
         })
         .catch((err) => {
           console.error(err);
+        });
+    },
+    deleteRequestAction(request, index) {
+      this.axios
+        .delete("api/requests", {
+          params: { option: '13', request_id: request.uid },
+        })
+        .then((res) => {
+          if(res.status===200){
+            console.log("delete request OK")
+            this.requestList.splice(index,1);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
         });
     },
   },

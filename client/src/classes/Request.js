@@ -6,6 +6,7 @@ class Request{
     order_id = undefined;
     slave_id = undefined;
     requesterName = undefined;
+    order_name = undefined;
     constructor(args) {
         this.uid = args['uid'];
         this.name = args['name'];
@@ -14,6 +15,7 @@ class Request{
         this.order_id = args['task_id'];
         this.requesterName = args['requester_name'];
         this.slave_id = args['requester_id'];
+        this.order_name = args['task_name']
     };
     updateState(state){
         this.state = state;

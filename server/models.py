@@ -180,7 +180,7 @@ class Success(CreateUpdateMixin):
     """
     uid = models.UUIDField(_(u'召集成功标识'), max_length=32, primary_key=True, default=uuid.uuid4, editable=False,
                            help_text=u'召集成功标识', db_index=True, unique=True)
-    request = models.OneToOneField(
+    request = models.ForeignKey(
         to='Request', to_field='uid', on_delete=CASCADE, verbose_name=u'请求标识', help_text=u'请求标识')
     master = models.CharField(
         _(u'令主标识'), max_length=32, blank=False, help_text=u'令主标识')

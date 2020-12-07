@@ -5,6 +5,8 @@ import sys
 from django.core import serializers  # 引入序列化方法
 from django.db import transaction  # 引入数据库事务模块
 from django.http import QueryDict
+from django.http.request import HttpRequest
+from django.http.response import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt  # 引入防跨站请求伪造装饰器
 
 from server.models import Profile  # 引入Profile数据模型
@@ -32,18 +34,19 @@ def register(request):
     try:
         p = Profile.objects.get(account=account)
     except Profile.DoesNotExist:  # 用户信息不存在
-        Profile.objects.create(  # 创建新用户信息并写入数据库
-            account=account,
-            password=password,
-            city=city,
-            introduction=introduction,
-            cert_type=cert_type,
-            cert_number=cert_number,
-            phone=phone,
-            user_name=name,
-            user_type=1,
-            user_level=0,
-        )
+        with transaction.atomic():
+            Profile.objects.create(  # 创建新用户信息并写入数据库
+                account=account,
+                password=password,
+                city=city,
+                introduction=introduction,
+                cert_type=cert_type,
+                cert_number=cert_number,
+                phone=phone,
+                user_name=name,
+                user_type=1,
+                user_level=0,
+            )
         return json_response(200, 'OK', {  # 返回用户uid
             'uid': Profile.objects.values().get(account=account).get('uid')
         })
@@ -64,10 +67,10 @@ def login(request):
     try:
         p = Profile.objects.values().get(account=account)
     except Profile.DoesNotExist:
-        return json_response(300001, 'User Not Found', {})
+        return HttpResponseBadRequest("没有该用户")
     else:
         if p.get('password') != password:
-            return json_response(300002, 'Password Error', {})
+            return HttpResponseBadRequest("密码错误")
         else:
             return json_response(200,"OK",{
                     'uid':p.get('uid'),

@@ -226,12 +226,12 @@
                             required
                             outlined
                             auto-grow
-                            counter="20"
-                            maxlength="20"
+                            counter="200"
+                            maxlength="200"
                             :rules="[
                               () =>
-                                (!!modify.info && modify.info.length <= 100) ||
-                                '必须不大于100个字',
+                                (!!modify.info && modify.info.length <= 200) ||
+                                '必须不大于200个字',
                             ]"
                           ></v-textarea>
                         </v-flex>
@@ -340,7 +340,7 @@ export default {
       date: new Date(),
       orderList: [],
       requestList: [],
-      orderStatus: { 0: "等待召集", 1: "召集中" },
+      orderStatus: { 0: "等待召集", 1: "召集中" ,2:"已删除",3:"逾期"},
       statusColor: { 0: "warning", 1: "success", 2: "error" },
       requestStatus: { 0: "等待处理", 1: "同意", 2: "拒绝" },
       order_types: [
@@ -412,11 +412,11 @@ export default {
       this.modify.name = order.name;
       this.modify.info = order.info;
       this.modify.type = order.type;
-      this.order_types[order.type].value = true;
+      // this.order_types[order.type].value = true;
     },
     modifyOrderAction(order, putInfo, index) {
-      if (putInfo.info.length > 20) {
-        alert("必须不大于20个字");
+      if (putInfo.info.length > 200) {
+        alert("必须不大于200个字");
       } else {
         order.modifyDialogSwitcher = false;
         this.axios
@@ -472,6 +472,9 @@ export default {
           if (res.status === 200) {
             const requestObj = res.data;
             request.updateState(state);
+            if(state){
+              this.orderList[index].currentSummoningCount++;
+            }
             // console.log(requestObj);
           } else {
             console.log("发送失败");

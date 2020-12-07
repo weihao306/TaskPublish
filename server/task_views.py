@@ -22,7 +22,7 @@ def manage_task(request):
             return all_task(request)
         elif body.get('master_id', None) != None:
             return query_master_task(request)
-        elif body.get('task_id',None) !=None:
+        elif body.get('task_id', None) != None:
             return query_one_task(request)
         # else:
         #     return query_slave_task(request)
@@ -40,7 +40,11 @@ def all_task(request):
     """
     查询所有召集令的信息
     """
+    Task.objects.filter(end_time__lt=date.today()).update(
+        task_status=Task.OVERDUE)
+
     task = list(Task.objects.values().all())
+
     # data = serializers.serialize('json', task, fields=('updated_at',))
     return json_response(200, 'OK', task)
 
@@ -51,9 +55,13 @@ def query_master_task(request):
     """
     令主查询自己所有的召集令信息
     """
+    Task.objects.filter(end_time__lt=date.today()).update(
+        task_status=Task.OVERDUE)
+
     # body = json.loads(request.body)
     body = request.GET
     master = body.get('master_id', '')
+
     try:
         task = list(Task.objects.values().filter(master__exact=master))
     except Exception as e:
@@ -72,6 +80,9 @@ def query_one_task(request):
     查询单独召集令信息
     """
     # body = json.loads(request.body)
+    Task.objects.filter(end_time__lt=date.today()).update(
+        task_status=Task.OVERDUE)
+
     body = request.GET
     task_id = body.get('task_id', '')
     try:
@@ -91,6 +102,9 @@ def query_slave_task(request):
     """
     令主查询自己所有的召集令信息
     """
+    Task.objects.filter(end_time__lt=date.today()).update(
+        task_status=Task.OVERDUE)
+
     # body = json.loads(request.body)
     body = request.GET
     slave = body.get('slave_id', '')
@@ -123,34 +137,35 @@ def create_task(request):
    # start_time = body.get('start_time', date.today().strftime('%d-%m-%Y'))
    #  end_time = body.get('end_time', date.today().strftime('%d-%m-%Y'))
     task_status = 0
-    photo = body.get('photos',None)
+    photo = body.get('photos', None)
 
     try:
         p = Profile.objects.get(uid=master)
     except Profile.DoesNotExist:
-        raise Http404
+        return Http404
         # json_response(200001, 'User Not Found', {})
     else:
         try:
             t = Task.objects.values().get(master=master, task_name=task_name)
         except Task.DoesNotExist:
-            Task.objects.create(
-                master=p,
-                task_type=task_type,
-                task_name=task_name,
-                description=description,
-                cur_people=cur_people,
-                max_people=max_people,
-                #start_time=start_time,
-                #end_time=end_time,
-                task_status=task_status,
-                photo=photo,
-            )
+            with transaction.atomic():
+                Task.objects.create(
+                    master=p,
+                    task_type=task_type,
+                    task_name=task_name,
+                    description=description,
+                    cur_people=cur_people,
+                    max_people=max_people,
+                    # start_time=start_time,
+                    # end_time=end_time,
+                    task_status=task_status,
+                    photo=photo,
+                )
             try:
                 # task = Task.objects.filter(master__exact=master, start_time__exact=start_time, end_time__exact=end_time,
                 #                            max_people__exact=max_people).values()
                 task = Task.objects.values().get(master=master, task_name=task_name,
-                                        max_people=max_people)
+                                                 max_people=max_people)
             except Exception as e:
                 # return json_response(data={'error': str(e)})
                 return HttpResponseServerError
@@ -193,7 +208,7 @@ def update_task(request):
         task.task_name = body.get('order_name', '')
         task.task_type = body.get('order_type', 0)
         task.description = body.get('order_description', '')
-        task.task_type = body.get('order_type',0)
+        task.task_type = body.get('order_type', 0)
         if body.get('photo', None) != None:
             task.photo = body.get('photo')
 

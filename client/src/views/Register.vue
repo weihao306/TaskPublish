@@ -114,7 +114,7 @@
                   </v-btn>
                 </div>
 
-                <div class="text-center mt-3">
+                <!-- <div class="text-center mt-3">
                   <v-btn color="grey" to="Home">
                     返回主页
                     <v-icon right> mdi-logout-variant </v-icon>
@@ -122,7 +122,7 @@
                       <v-icon>cached</v-icon>
                     </span>
                   </v-btn>
-                </div>
+                </div> -->
               </v-flex>
             </v-form>
           </v-layout>
