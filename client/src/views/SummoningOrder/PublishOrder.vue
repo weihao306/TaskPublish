@@ -49,9 +49,7 @@
               maxlength="200"
               v-model="publishOrderInfo.info"
               :rules="[
-                () =>
-                  (publishOrderInfo.info.length <= 200) ||
-                  '最多200字',
+                () => publishOrderInfo.info.length <= 200 || '最多200字',
               ]"
             >
               <!-- <v-progress-linear
@@ -84,6 +82,9 @@
                     class="white--text align-self-center"
                     @click="
                       () => {
+                        publishOrderInfo.maximumSummoningCount = parseInt(
+                          publishOrderInfo.maximumSummoningCount
+                        );
                         publishOrderInfo.maximumSummoningCount -=
                           publishOrderInfo.maximumSummoningCount > 0 ? 1 : 0;
                       }
@@ -97,32 +98,15 @@
                     v-model="publishOrderInfo.maximumSummoningCount"
                     dense
                     type="number"
-                    hide-details
-                    size="6"
-                    d-block
-                    style="text-align-last: center"
-                    maxlength="2"
+                    messages="max 200"
+                    hint="max 200"
+                    d-flex
                     max-width="2rem"
-                    class="align-self-center"
-                    @change.native="
-                      () => {
-                        publishOrderInfo.maximumSummoningCount =
-                          publishOrderInfo.maximumSummoningCount < 0 ||
-                          publishOrderInfo.maximumSummoningCount > 200
-                            ? 0
-                            : publishOrderInfo.maximumSummoningCount;
-                      }
-                    "
+                    class="Height_24"
+                    oninput="if(parseInt(value)>200)value=200;if(parseInt(value)<0)value=0;"
                     :rules="[
-                      () =>
-                        (!!publishOrderInfo.maximumSummoningCount &&
-                          publishOrderInfo.maximumSummoningCount > 0 &&
-                          publishOrderInfo.maximumSummoningCount <= 200) ||
-                        '人数不能为0',
                     ]"
                   >
-                    <!-- <v-icon slot="append" color="red"></v-icon>
-                    <v-icon slot="prepend" color="primary"></v-icon>-->
                   </v-text-field>
                 </v-col>
                 <v-col cols="3">
@@ -135,6 +119,9 @@
                     class="white--text align-self-center"
                     @click="
                       () => {
+                        publishOrderInfo.maximumSummoningCount = parseInt(
+                          publishOrderInfo.maximumSummoningCount
+                        );
                         publishOrderInfo.maximumSummoningCount +=
                           publishOrderInfo.maximumSummoningCount < 200 ? 1 : 0;
                       }
@@ -360,5 +347,16 @@ input::-webkit-inner-spin-button {
 }
 input[type="number"] {
   -moz-appearance: textfield;
+  text-align: center;
+}
+.Height_24 input {
+  height: 24px;
+  font-size: 24px;
+  text-align-last: center;
+  text-align: center;
+}
+/* hack */
+.v-messages__message{
+  text-align: center;
 }
 </style>

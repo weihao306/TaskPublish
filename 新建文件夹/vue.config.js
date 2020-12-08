@@ -22,7 +22,7 @@ module.exports = {
     hot: true,
     // http2:false,
     port: 8080,
-    https: false,
+    // https: false,
     // mock接口设置
     // before: require("./src/mock"),
     // 设置代理，
@@ -71,15 +71,12 @@ module.exports = {
   },
 
   configureWebpack: config => {
-    // babel-polyfill 设置浏览器兼容性，兼容ie11~9
-    // config.entry.app = ["@vue/babel-preset-app", "./src/main.js"];
-    // 生产环境使用gzip
     if (process.env.NODE_ENV === 'production') {
       return {
         plugins: [
           new CompressionPlugin({
             algorithm: 'gzip',
-            test: /\.(js|css|html|jpg|png|jpeg)$/, // 匹配文件名
+            test: /\.(js|css)$/, // 匹配文件名
             threshold: 10240, // 对超过10k的数据压缩
             deleteOriginalAssets: false, // 不删除源文件
             minRatio: 0.8 // 压缩比
