@@ -22,8 +22,8 @@
                 <v-text-field
                   outlined
                   name="name"
-                  label="召集令标题"
                   v-model="publishOrderInfo.name"
+                  placeholder="召集令标题"
                   hide-details
                 ></v-text-field>
               </v-col>
@@ -31,7 +31,7 @@
                 <v-select
                   :items="orderType"
                   v-model="publishOrderInfo.type"
-                  label="召集令类型"
+                  placeholder="召集令类型"
                   outlined
                   hide-details
                   class="mb-3"
@@ -45,8 +45,14 @@
               auto-grow
               filled
               outlined
-              hide-details
+              counter="200"
+              maxlength="200"
               v-model="publishOrderInfo.info"
+              :rules="[
+                () =>
+                  (publishOrderInfo.info.length <= 200) ||
+                  '最多200字',
+              ]"
             >
               <!-- <v-progress-linear
             slot="progress"
@@ -58,66 +64,99 @@
           </v-card-text>
 
           <v-layout row wrap justify-center class="my-3">
-            <v-flex xs12 sm4 md4>
-              <v-layout row wrap class="justify-center">
+            <v-flex xs12 sm5 md4>
+              <v-layout row wrap class="justify-center my-1">
                 <blockquote class="text-justify text-h6 font-weight-bold">
                   召集最大人数
                 </blockquote>
               </v-layout>
             </v-flex>
-            <v-flex xs8 sm4 md4 class="justify-center align-center">
-              <div mandatory multiple>
-                <v-layout row wrap>
-                  <v-flex>
-                    <v-btn
-                      small
-                      dark
-                      block
-                      width="1"
-                      class="white--text"
-                      color="primary"
-                      @click="maximumCount -= 1"
-                    >
-                      <v-icon>mdi-minus</v-icon>
-                    </v-btn>
-                  </v-flex>
-                  <v-flex>
-                    <v-text-field
-                      v-model="publishOrderInfo.maximumSummoningCount"
-                      dense
-                      hide-details
-                      size="6"
-                      style="text-align-last: center"
-                    >
-                      <!-- <v-icon slot="append" color="red"></v-icon>
+            <v-flex xs8 sm4 md4 class="justify-center align-center my-1">
+              <v-row no-gutters justify="center" align-content="center">
+                <v-col cols="3">
+                  <v-btn
+                    ma-0
+                    small
+                    dark
+                    block
+                    width="1"
+                    color="primary"
+                    class="white--text align-self-center"
+                    @click="
+                      () => {
+                        publishOrderInfo.maximumSummoningCount -=
+                          publishOrderInfo.maximumSummoningCount > 0 ? 1 : 0;
+                      }
+                    "
+                  >
+                    <v-icon>mdi-minus</v-icon>
+                  </v-btn>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="publishOrderInfo.maximumSummoningCount"
+                    dense
+                    type="number"
+                    hide-details
+                    size="6"
+                    d-block
+                    style="text-align-last: center"
+                    maxlength="2"
+                    max-width="2rem"
+                    class="align-self-center"
+                    @change.native="
+                      () => {
+                        publishOrderInfo.maximumSummoningCount =
+                          publishOrderInfo.maximumSummoningCount < 0 ||
+                          publishOrderInfo.maximumSummoningCount > 200
+                            ? 0
+                            : publishOrderInfo.maximumSummoningCount;
+                      }
+                    "
+                    :rules="[
+                      () =>
+                        (!!publishOrderInfo.maximumSummoningCount &&
+                          publishOrderInfo.maximumSummoningCount > 0 &&
+                          publishOrderInfo.maximumSummoningCount <= 200) ||
+                        '人数不能为0',
+                    ]"
+                  >
+                    <!-- <v-icon slot="append" color="red"></v-icon>
                     <v-icon slot="prepend" color="primary"></v-icon>-->
-                    </v-text-field>
-                  </v-flex>
-                  <v-flex>
-                    <v-btn
-                      small
-                      dark
-                      block
-                      width="1"
-                      class="white--text"
-                      color="red"
-                      @click="maximumCount += 1"
-                    >
-                      <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                  </v-flex>
-                </v-layout>
-              </div>
+                  </v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-btn
+                    small
+                    dark
+                    block
+                    width="1"
+                    color="red"
+                    class="white--text align-self-center"
+                    @click="
+                      () => {
+                        publishOrderInfo.maximumSummoningCount +=
+                          publishOrderInfo.maximumSummoningCount < 200 ? 1 : 0;
+                      }
+                    "
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-flex>
           </v-layout>
 
-          <v-layout row wrap justify-center>
-            <v-flex xs3 mt-1>
-              <blockquote class="text-justify text-h6 font-weight-bold">
+          <v-layout row wrap justify-center class="mt-6">
+            <v-flex xs10 sm4>
+              <nav
+                class="text-justify text-h6 font-weight-bold"
+                style="text-align-last: center"
+              >
                 上传照片
-              </blockquote>
+              </nav>
             </v-flex>
-            <v-flex xs6>
+            <v-flex xs10 sm4>
               <v-file-input
                 dense
                 counter
@@ -139,11 +178,36 @@
 
           <v-layout row wrap justify-center>
             <v-flex xs11>
-              <v-carousel v-model="selectedPhoto" height="30vh">
+              <!-- <v-carousel v-model="selectedPhoto" height="50vh">
                 <v-carousel-item v-for="img of imgs" :key="img.key" :src="img">
-                  <!-- <img v-for="img of imgs" :key="img.key" :src="img"> -->
                 </v-carousel-item>
-              </v-carousel>
+              </v-carousel> -->
+
+              <!-- <img v-for="img of imgs" :key="img.key" :src="img"> -->
+              <v-window v-model="onboarding">
+                <v-window-item v-for="(img, n1) of imgs" :key="`card-${n1}`">
+                  <v-card class="mx-auto my-auto elevation-8">
+                    <v-img contain :src="img" height="30vh"> </v-img>
+                    <!-- <v-card-title primary-title> </v-card-title> -->
+                  </v-card>
+                </v-window-item>
+              </v-window>
+              <v-item-group
+                v-model="onboarding"
+                mandatory
+                class="text-center justify-center"
+              >
+                <v-item v-for="(img, n2) of imgs" :key="`btn-${n2}`">
+                  <v-btn
+                    slot-scope="{ active, toggle }"
+                    :input-value="active"
+                    @click="toggle"
+                    icon
+                  >
+                    <v-icon>mdi-record</v-icon>
+                  </v-btn>
+                </v-item>
+              </v-item-group>
             </v-flex>
           </v-layout>
           <v-divider></v-divider>
@@ -160,8 +224,13 @@
 <script>
 import OrderInfo from "@/classes/OrderInfo";
 export default {
+  mounted() {
+    this.publishOrderInfo.maximumSummoningCount = 0;
+  },
   data() {
     return {
+      onboarding: 0,
+
       publishOrderInfo: new OrderInfo(),
 
       maximumCount: 0,
@@ -205,7 +274,7 @@ export default {
           // url = "data:image/*;base64," + tmpUrl;
           url = fr.result;
           console.log(url);
-          this.imgs.push(fr.result);
+          this.imgs.unshift(fr.result);
         };
       }
     },
@@ -239,12 +308,19 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             alert("发布成功");
-            this.$router.push({name:'Master'});            
+            this.$router.push({ name: "Master" });
           }
         })
         .catch((err) => {
           console.error(err);
         });
+    },
+
+    next() {
+      this.onboarding = (this.onboarding + 1) % this.length;
+    },
+    prev() {
+      this.onboarding = (this.onboarding + this.length - 1) % this.length;
     },
   },
   watch: {
@@ -255,9 +331,34 @@ export default {
         }
       }
     },
+    publishOrderInfo: {
+      handler(oldVal, newVal) {
+        if (
+          !this.$data.publishOrderInfo.maximumSummoningCount instanceof Number
+        ) {
+          this.$data.publishOrderInfo.maximumSummoningCount = new Number(
+            newVal
+          );
+        }
+        if (newVal > 200 || newVal < 0) {
+          this.$data.publishOrderInfo.maximumSummoningCount = oldVal;
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
   },
 };
 </script>
 
-<style lang="css" scoped>
+<style lang="css">
+/* 去除input框内的上下箭头 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 </style>

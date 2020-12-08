@@ -120,6 +120,7 @@
                             label="密码"
                             type="password"
                             required
+                            :rules="[()=>(modifyInfo.password.length>0||'输入为空不更新')]"
                           />
                         </v-flex>
                         <v-flex xs11 sm9 md7>
@@ -166,7 +167,6 @@
                       <v-btn
                         color="success"
                         @click.native="
-                          modifyInfoSwitcher = false;
                           confirmModifyInfo();
                         "
                         >确认修改</v-btn
@@ -250,6 +250,7 @@ export default {
                 this.userInfo.updateInfo(this.modifyInfo);
               }
               this.$store.commit("saveUserInfo", this.userInfo);
+              this.modifyInfoSwitcher = false;
             }
           });
       } else {
@@ -258,7 +259,7 @@ export default {
     },
     modifyInfoInit(userInfo) {
       // this.modifyInfo.nick_name = userInfo.nick_name;
-      this.modifyInfo.password = userInfo.password;
+      this.modifyInfo.password = userInfo.password?userInfo.password:"";
       this.modifyInfo.repeatPassword = "";
       this.modifyInfo.telephone = userInfo.telephone;
       this.modifyInfo.introduction = userInfo.introduction;

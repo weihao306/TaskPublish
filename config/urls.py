@@ -28,9 +28,9 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='index'),
     url(r'user/', include('server.user_urls')),
     # url(r'tasks', include('server.task_urls')),
-    url(r'^tasks', manage_task, name='manage task'),
+    url(r'tasks', manage_task, name='manage task'),
     # url(r'requests', include('server.request_urls'))
-    url(r'^requests', manage_request, name='manage task')
+    url(r'requests', manage_request, name='manage task')
 ]
 
 admin.site.site_header = "[召集令 管理系统]"

@@ -27,23 +27,18 @@
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </v-list-item>
-        <v-list-item three-line>
+        <v-list-item two-line>
           <v-list-item-content>
             <v-list-item-subtitle>
-            <!-- <div class="col-12 text-truncate"> -->
               {{ User.introduction }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-
-        <v-list-item v-if="UserID" link>
-          <v-list-item-content>
-            <v-list-item-title class="title"> 用户 </v-list-item-title>
-            <!-- <v-list-item-subtitle></v-list-item-subtitle> -->
-          </v-list-item-content>
-        </v-list-item>
       </v-list>
 
+      <nav class="col-12 text-subtitle-1">
+        {{ User.introduction }}
+      </nav>
 
       <v-divider />
       <v-divider />

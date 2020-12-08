@@ -12,58 +12,50 @@
     sm4
     class="elevation-3"
   >
-    <!-- 侧栏按钮 -->
-    <v-app-bar-nav-icon @click.stop="switchToggle" />
-    <!-- 小屏幕导航栏 -->
-    <v-menu offset-y activator bottom right>
-      <!-- <v-btn color="primary" dark slot="activator" class="hidden-md-and-up">导航</v-btn> -->
-      <template v-slot:activator="{ on,attrs }">
-        <v-btn
-          color="majorColor"
-          dark
-          class="hidden-sm-and-up"
-          v-on="on"
-          v-bind="attrs"
-          min-width="5.5rem"
-        >
-          导航
-        </v-btn>
-      </template>
-      <v-list>
-        <v-list-item
-          v-for="Page of Pages"
-          :key="Page.key"
-          :to="{ name: Page.link }"
-          class="text-caption"
-        >
-          <v-list-item-action-text>{{ Page.title }}</v-list-item-action-text>
-        </v-list-item>
-      </v-list>
-    </v-menu>
-    <!-- 大屏幕导航栏 -->
-
-    <!-- <v-btn
-      v-for="Page of Pages"
-      :key="Page.id"
-      :to="Page.Link"
-      text
-      class="hidden-sm-and-down"
-    >
-      <v-icon xs>
-        {{ Page.Name }}
-      </v-icon>
-    </v-btn> -->
+      <!-- 侧栏按钮 -->
+      <v-app-bar-nav-icon @click.stop="switchToggle" />
+      <!-- 小屏幕导航栏 -->
+      <v-menu offset-y activator bottom right>
+        <!-- <v-btn color="primary" dark slot="activator" class="hidden-md-and-up">导航</v-btn> -->
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            color="majorColor"
+            dark
+            class="hidden-sm-and-up"
+            v-on="on"
+            v-bind="attrs"
+            min-width="5.5rem"
+          >
+            导航
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="(Page,index) of Pages"
+            :key="index"
+            :to="{ name: Page.link }"
+            class="text-caption"
+          >
+            <v-list-item-action-text>{{ Page.title }}</v-list-item-action-text>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
     <v-spacer />
-    <v-text-field
-      size="1"
-      dense
-      single-line
-      solo
-      light
-      placeholder="Search"
-      class="hidden-xs-and-down mt-7 ml-2 mr-2"
-    />
+
+    <v-layout row wrap>
+      <v-flex xs12 offset-xs3>
+        <v-text-field
+          dense
+          single-line
+          solo
+          light
+          label="Search"
+          class="hidden-xs-and-down mt-7 ml-2 mr-2"
+          max-width="100vw"
+        />
+      </v-flex>
+    </v-layout>
     <!-- <input v-model="Search" type="text" /> -->
     <v-btn text icon>
       <v-icon>mdi-magnify</v-icon>
