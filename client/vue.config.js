@@ -1,16 +1,7 @@
 const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = {
-
-  // css: {
-  //   extract: false
-  // },
-
-  lintOnSave: false,
-
   transpileDependencies: ["vuetify"],
-
-
 
   devServer: {
     open: (function () {
@@ -20,11 +11,13 @@ module.exports = {
     // open: process.arch === "x64",
     // host: '127.0.0.1',
     hot: true,
-    // http2:false,
+    http2:false,
     port: 8080,
     https: false,
+
     // mock接口设置
     // before: require("./src/mock"),
+    
     // 设置代理，
     proxy: {
       "/api": {
@@ -56,11 +49,8 @@ module.exports = {
     extract: false
   },
 
-
-
-
   chainWebpack: config => {
-    config.entry('main').add('babel-polyfill')
+    // config.entry('main').add('@vue/cli-plugin-babel/preset')
 
     config
       .plugin('html')
@@ -90,5 +80,6 @@ module.exports = {
   },
 
   assetsDir: 'static',
-  productionSourceMap: false
+  productionSourceMap: false,
+  lintOnSave: false
 }

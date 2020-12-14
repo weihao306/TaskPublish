@@ -2,7 +2,7 @@
   <v-container grid-list-xs fluid>
     <v-navigation-drawer
       ref="SlideBar"
-      v-model="SlideBarToggle"
+      v-model="Toggle"
       v-clickoutside="handleClose"
       app
       clipped
@@ -19,7 +19,7 @@
           <v-list-item-content>
             <v-list-item-title>
               {{ User.nick_name }}
-            </v-list-item-title>
+          </v-list-item-title>
           </v-list-item-content>
           <!-- <v-btn v-show="(User===undefined)"> 登录 </v-btn> -->
 
@@ -27,18 +27,18 @@
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </v-list-item>
-        <v-list-item two-line>
+        <v-list-item two-line >
           <v-list-item-content>
-            <v-list-item-subtitle>
+            <v-list-item-subtitle class="col-12 text-subtitle-1">
               {{ User.introduction }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
 
-      <nav class="col-12 text-subtitle-1">
+      <!-- <nav >
         {{ User.introduction }}
-      </nav>
+      </nav> -->
 
       <v-divider />
       <v-divider />
@@ -117,15 +117,20 @@ export default {
     // User:Object
   },
   data() {
-    return {};
+    return {
+      Toggle:false
+    };
   },
   computed: {
     User: (vm) => vm.$store.state.userInfo,
   },
   watch: {
-    SlideBarToggle: function (val) {
-      this.$emit("switchToggle", val);
+    SlideBarToggle(newVal,oldVal) {
+      this.Toggle = newVal;
     },
+    Toggle(newVal,oldVal){
+      this.$emit("switchToggle", newVal);
+    }
   },
   beforeDestroy() {
     // window.removeEventListener('resize', this.mdSetting, { passive: true })
@@ -138,7 +143,7 @@ export default {
   },
   methods: {
     handleClose() {
-      this.SlideBarToggle = false;
+      this.Toggle = false;
     },
     logOut() {
       this.$store.dispatch("logoutAction").then(() => {

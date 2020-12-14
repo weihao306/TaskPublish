@@ -28,18 +28,24 @@ import Request from "@/classes/Request.js";
 export default new Vuex.Store({
   state: {
     isAuth: JSON.parse(localStorage.getItem('isAuth')),
+    isAdminAuth:JSON.parse(localStorage.getItem("isAdminAuth")),
     userInfo: new User(JSON.parse(localStorage.getItem('userInfo'))), // new User()
     orders: JSON.parse(localStorage.getItem('orders')),
     requests: JSON.parse(localStorage.getItem('requests'))
   },
   getters: {
     // 转换为bool值
-    isAuth: state => state.isAuth
+    isAuth: state => state.isAuth,
+    isAdminAuth:state =>state.isAdminAuth
   },
   mutations: {
     //save the login state
     userStatus(state, setState) {
       state.isAuth = setState
+      localStorage.setItem('isAuth', JSON.stringify(setState))
+    },
+    AdminStatus(state,setState){
+      state.isAdminAuth = setState
       localStorage.setItem('isAuth', JSON.stringify(setState))
     },
     saveUserInfo(state, userlikeObj) {

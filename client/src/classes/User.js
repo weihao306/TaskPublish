@@ -27,7 +27,7 @@ class User {
             this.cert_type = args.cert_type;
             this.cert_number = args.cert_number;
         }
-    };
+    }
     set_uid(uid) {
         this.uid = uid;
     }

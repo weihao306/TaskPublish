@@ -15,12 +15,12 @@
           <v-layout row align-center justify-center class="py-5">
             <v-form @submit.prevent="postLogin">
               <v-flex xs12>
-                <h1 class="text-center mb-5">欢迎来到'召集令'</h1>
+                <h1 class="text-center mb-5">'召集令'管理</h1>
                 <v-text-field
                   id="ID"
-                  v-model="userInfo.account"
+                  v-model="Admin.account"
                   name="ID"
-                  label="ID"
+                  label="管理员ID"
                   type="input"
                   required
                 />
@@ -29,9 +29,9 @@
               <v-flex xs12>
                 <v-text-field
                   id="password"
-                  v-model="userInfo.password"
+                  v-model="Admin.password"
                   name="password"
-                  label="password"
+                  label="密码"
                   type="password"
                   required
                 />
@@ -69,18 +69,6 @@
               </v-flex>
             </v-form>
           </v-layout>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <a
-              @click="
-                () => {
-                  this.$router.push({ name: 'Register' });
-                }
-              "
-            >
-              <p class="text-decoration-underline">还没有账号？</p>
-            </a>
-          </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>
@@ -93,7 +81,7 @@ export default {
   name: "Login",
   // props:["title","account","password","LoginFunc"],
   data: () => ({
-    userInfo: {
+    Admin: {
       account: undefined,
       password: undefined,
     },
@@ -107,11 +95,11 @@ export default {
   methods: {
     postLogin: function () {
       this.axios
-        .post("api/user/login", this.userInfo)
+        .post("api/user/login", this.Admin)
         .then((res) => {
-          // respone the userInfo
-          const userInfo = res.data;
-          console.log(userInfo);
+          // respone the Admin
+          const Admin = res.data;
+          console.log(Admin);
           if (res.status === 200) {
             if (res.data.status === 300001) {
               alert("用户名未注册");
@@ -119,10 +107,10 @@ export default {
               alert("密码错误");
             } else {
               alert("登录成功");
-              this.$store.dispatch("loginAction", userInfo).then(() => {
+              this.$store.dispatch("loginAction", Admin).then(() => {
                 this.$router.push({
-                  name: "UserInfo",
-                  params: { uid: userInfo.uid },
+                  name: "Admin",
+                  params: { uid: Admin.uid },
                 });
               });
             }

@@ -89,9 +89,7 @@
                       v-bind="attrs"
                       v-on="on"
                       dark
-                      @click.native.stop="
-                        modifyInfoInit(userInfo);
-                      "
+                      @click.native.stop="modifyInfoInit(userInfo)"
                     >
                       修改信息
                       <v-icon right> mdi-wrench-outline </v-icon>
@@ -120,7 +118,11 @@
                             label="密码"
                             type="password"
                             required
-                            :rules="[()=>(modifyInfo.password.length>0||'输入为空不更新')]"
+                            :rules="[
+                              () =>
+                                modifyInfo.password.length > 0 ||
+                                '输入为空不更新',
+                            ]"
                           />
                         </v-flex>
                         <v-flex xs11 sm9 md7>
@@ -164,11 +166,7 @@
                     <v-divider></v-divider>
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn
-                        color="success"
-                        @click.native="
-                          confirmModifyInfo();
-                        "
+                      <v-btn color="success" @click.native="confirmModifyInfo()"
                         >确认修改</v-btn
                       >
                     </v-card-actions>
@@ -202,8 +200,8 @@ export default {
   data() {
     return {
       modifyInfoSwitcher: false,
-      trueValue:true,
-      userInfo:this.$store.state.userInfo,
+      trueValue: true,
+      userInfo: this.$store.state.userInfo,
       // userInfo: {
       //   uid:undefined,
       //   nick_name:undefined,
@@ -226,7 +224,7 @@ export default {
   methods: {
     getUserInfo() {
       this.axios
-        .get("api/user/info", {params: {uid: this.userInfo.uid }})
+        .get("api/user/info", { params: { uid: this.userInfo.uid } })
         .then((res) => {
           const info = res.data;
           this.userInfo = new User(info);
@@ -246,7 +244,7 @@ export default {
             if (res.status === 200) {
               alert("修改信息成功");
               // let newUser = new User(this.userInfo);
-              if(this.userInfo instanceof User){
+              if (this.userInfo instanceof User) {
                 this.userInfo.updateInfo(this.modifyInfo);
               }
               this.$store.commit("saveUserInfo", this.userInfo);
@@ -259,7 +257,7 @@ export default {
     },
     modifyInfoInit(userInfo) {
       // this.modifyInfo.nick_name = userInfo.nick_name;
-      this.modifyInfo.password = userInfo.password?userInfo.password:"";
+      this.modifyInfo.password = userInfo.password ? userInfo.password : "";
       this.modifyInfo.repeatPassword = "";
       this.modifyInfo.telephone = userInfo.telephone;
       this.modifyInfo.introduction = userInfo.introduction;

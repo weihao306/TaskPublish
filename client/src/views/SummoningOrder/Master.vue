@@ -34,6 +34,24 @@
           </v-layout>
         </v-card>
 
+        <!-- <card>
+          <template v-slot:title>
+            <v-layout row wrap justify="center">
+              <format-text size="mid" center>新的召集令</format-text>
+            </v-layout>
+          </template>
+          <template v-slot:action>
+            <v-layout row wrap justify="center">
+              <v-btn
+                class="TextCenter"
+                color="success"
+                :to="{ name: 'PublishOrder' }"
+                >发布召集令</v-btn
+              >
+            </v-layout>
+          </template>
+        </card> -->
+
         <v-card
           class="mx-auto my-3 elevation-8"
           outlined
@@ -114,14 +132,18 @@
                                 <v-spacer></v-spacer>
                                 <v-btn
                                   color="success"
-                                  @click.stop="acceptTheRequest(index);
-                                  order.requestsSwitcher = false;"
+                                  @click.stop="
+                                    acceptTheRequest(index);
+                                    order.requestsSwitcher = false;
+                                  "
                                   >同意</v-btn
                                 >
                                 <v-btn
                                   color="error"
-                                  @click.stop="denyTheRequest(index);
-                                  order.requestsSwitcher = false;"
+                                  @click.stop="
+                                    denyTheRequest(index);
+                                    order.requestsSwitcher = false;
+                                  "
                                   >拒绝</v-btn
                                 >
                               </v-card-actions>
@@ -332,15 +354,22 @@
 <script>
 import Order from "@/classes/Order.js";
 import Request from "@/classes/Request.js";
+import Card from "@/components/Card.vue";
+import FormatText from "@/components/FormatText.vue";
 export default {
+  components: {
+    // card:()=>import("@/components/Card.vue")
+    Card,
+    FormatText,
+  },
   data() {
     return {
       trueValue: true,
-      testDate : new Date("2020-12-6"),
+      testDate: new Date("2020-12-6"),
       date: new Date(),
       orderList: [],
       requestList: [],
-      orderStatus: { 0: "等待召集", 1: "召集中" ,2:"已删除",3:"逾期"},
+      orderStatus: { 0: "等待召集", 1: "召集中", 2: "已删除", 3: "逾期" },
       statusColor: { 0: "warning", 1: "success", 2: "error" },
       requestStatus: { 0: "等待处理", 1: "同意", 2: "拒绝" },
       order_types: [
@@ -465,14 +494,14 @@ export default {
         .put("api/requests", {
           option: "01",
           request_id: request.uid,
-          state: state?"accepted":"denied",
-          time: this.date.toLocaleDateString().split('/').join('-'),
+          state: state ? "accepted" : "denied",
+          time: this.date.toLocaleDateString().split("/").join("-"),
         })
         .then((res) => {
           if (res.status === 200) {
             const requestObj = res.data;
             request.updateState(state);
-            if(state){
+            if (state) {
               this.orderList[index].currentSummoningCount++;
             }
             // console.log(requestObj);
@@ -488,5 +517,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="css">
+.TextCenter {
+  text-align: center;
+  text-align-last: center;
+}
 </style>

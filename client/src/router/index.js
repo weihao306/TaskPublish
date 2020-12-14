@@ -62,7 +62,7 @@ const mainViews = [{
     }
   },
   {
-    path: 'User/:uid',
+    path: 'User',
     name: 'UserInfo',
     component: () => import('../views/User/Info.vue'),
     props:true,
@@ -101,12 +101,22 @@ const routes = [{
   {
     path: '/Login',
     name: 'Login',
-    component: () => import('../views/Login.vue'),
+    component: () => import('@/views/Login.vue'),
   },
   {
     path: '/Register',
     name: 'Register',
-    component: () => import('../views/Register.vue')
+    component: () => import('@/views/Register.vue')
+  },
+  {
+    path: '/Admin/Login',
+    name: 'AdminLogin',
+    component: () => import('@/views/Admin/Login.vue'),
+  },
+  {
+    path: '/Admin/Statistics',
+    name: 'Statistics',
+    component: () => import('@/views/Admin/Statistics.vue'),
   },
   {
     path: '*',

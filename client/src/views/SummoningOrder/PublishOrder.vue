@@ -255,7 +255,7 @@ export default {
       let url = undefined;
       for (let file of files) {
         fr.readAsDataURL(file);
-        fr.onload = (e) => {
+        fr.onload = () => {
           // url = this.result;
           // tmpUrl = this.result.substring(this.result.indexOf(",") + 1);
           // url = "data:image/*;base64," + tmpUrl;
