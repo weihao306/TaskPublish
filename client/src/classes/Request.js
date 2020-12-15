@@ -16,19 +16,19 @@ class Request{
         this.requesterName = args['requester_name'];
         this.slave_id = args['requester_id'];
         this.order_name = args['task_name']
-    };
+    }
     updateState(state){
         this.state = state;
-    };
+    }
     updateMsg(msg){
         this.msg = msg;
-    };
+    }
     updateRequesterName(name){
         this.requesterName = name;
     }
     updateTitle(name){
         this.name = name;
-    };
+    }
 
     updateInfo(req){
         this.updateRequesterName(req['requester_name'])

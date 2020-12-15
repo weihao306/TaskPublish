@@ -12,34 +12,34 @@
     sm4
     class="elevation-3"
   >
-      <!-- 侧栏按钮 -->
-      <v-app-bar-nav-icon @click.stop="switchToggle" />
-      <!-- 小屏幕导航栏 -->
-      <v-menu offset-y activator bottom right>
-        <!-- <v-btn color="primary" dark slot="activator" class="hidden-md-and-up">导航</v-btn> -->
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="majorColor"
-            dark
-            class="hidden-sm-and-up"
-            v-on="on"
-            v-bind="attrs"
-            min-width="5.5rem"
-          >
-            导航
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="(Page,index) of Pages"
-            :key="index"
-            :to="{ name: Page.link }"
-            class="text-caption"
-          >
-            <v-list-item-action-text>{{ Page.title }}</v-list-item-action-text>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+    <!-- 侧栏按钮 -->
+    <v-app-bar-nav-icon @click.stop="switchToggle" />
+    <!-- 小屏幕导航栏 -->
+    <v-menu offset-y activator bottom right>
+      <!-- <v-btn color="primary" dark slot="activator" class="hidden-md-and-up">导航</v-btn> -->
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          color="majorColor"
+          dark
+          class="hidden-sm-and-up"
+          v-on="on"
+          v-bind="attrs"
+          min-width="5.5rem"
+        >
+          导航
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
+          v-for="(Page, index) of Pages"
+          :key="index"
+          :to="{ name: Page.link }"
+          class="text-caption"
+        >
+          <v-list-item-action-text>{{ Page.title }}</v-list-item-action-text>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
     <v-spacer />
 
@@ -82,30 +82,19 @@ export default {
   },
   data: () => ({
     Search: undefined,
-    // Pages: [
-    //   {
-    //     Name: "召集令信息查",
-    //     Link: "/QueryBoard"
-    //   },
-    //   {
-    //     Name: "房间信息",
-    //     Link: "/RoomDetail/admin"
-    //   },
-    //   {
-    //     Name: "用户信息",
-    //     Link: "/User"
-    //   },
-    //   {
-    //     Name: "计费详情",
-    //     Link: "/Bill"
-    //   }
-    // ]
+    Toggle:false
   }),
-  computed: {},
+  watch:{
+    SlideBarToggle(newVal,oldVal){
+      this.Toggle = newVal;
+    },
+    Toggle(newVal,oldVal){
+      this.$emit("switchToggle", newVal);
+    }
+  },
   methods: {
     switchToggle: function () {
-      this.SlideBarToggle = !this.SlideBarToggle;
-      this.$emit("switchToggle", this.SlideBarToggle);
+      this.Toggle = !this.Toggle;
     },
   },
 };
