@@ -69,8 +69,8 @@
             {{ order.info }}
           </v-card-text>
           <v-card-title>
+            <v-chip flat>截止日期:{{order.end_date}}</v-chip>
             <v-spacer></v-spacer>
-
             <v-dialog
               v-model="order.switcher"
               scrollable
@@ -85,7 +85,8 @@
                   color="primary"
                   v-show="
                     !ordersBeenRequest_uids.includes(order.uid) &&
-                    order.currentSummoningCount < order.maximumSummoningCount
+                    order.currentSummoningCount < order.maximumSummoningCount &&
+                    order.status !== 3
                   "
                   >{{ "申请加入" }}</v-btn
                 >
@@ -136,25 +137,9 @@
 <script>
 import Order from "@/classes/Order.js";
 export default {
-  // beforeUpdate(){
-  //   localStorage.setItem('ordersBeenRequest_uids',JSON.parse(this.ordersBeenRequest_uids));
-  // },
   watch: {},
   mounted() {
-    // window.onbeforeunload = (e) => {
-    //   localStorage.setItem(
-    //     "ordersBeenRequest_uids",
-    //     JSON.parse(this.ordersBeenRequest_uids)
-    //   );
-    // };
-    // console.log(this.$store.state.requests.map(el => el.uid));
     this.getAllOrder();
-    // if (this.ordersBeenRequest_uids === undefined) {
-    //   this.ordersBeenRequest_uids = localStorage.getItem(
-    //     "ordersBeenRequest_uids"
-    //   );
-    // }
-    // console.log(this.selectedTypeKeys)
   },
   computed: {},
   data() {
@@ -171,11 +156,11 @@ export default {
         { text: "公益志愿者", value: 3 },
         { text: "游玩", value: 4 },
       ],
+      orderStatus: this.$store.state.orderStatus,
+      statusColor: this.$store.state.statusColor,
+      requestStatus: this.$store.state.requestStatus,
       requestMsg: "",
-      // selectypes:["社会实践", "公益志愿者"],
-      // selectOptions: ["技术交流", "学业探讨", "社会实践", "公益志愿者", "游玩"],
 
-      // selectOptions: {"技术交流":0, "学业探讨":1, "社会实践":2, "公益志愿者":3, "游玩":4},
       color: ["error", "warning", "success", "primary"],
       orderList: new Array(),
     };

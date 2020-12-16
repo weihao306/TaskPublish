@@ -286,7 +286,7 @@ def slave_delete(request):
     """
     接令人删除为同意的召集令请求
     """
-    # body = json.loads(request.body)
+    # body = json.loads(request.body) 
     body = request.GET
     req = body.get('request_id', '')
     try:

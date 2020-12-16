@@ -11,7 +11,7 @@ export default class Order {
     start_date = undefined;
     end_date = undefined;
     type = undefined;
-    photos =undefined;
+    photos = [];
     joinRequests =[{
         massess_uid:undefined,
         request_msg:undefined
