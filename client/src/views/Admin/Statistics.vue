@@ -82,7 +82,7 @@
         padding="30"
         stroke-linecap="round"
         smooth
-        line-width="2rem"
+        line-width="1rem"
         auto-line-width
       >
         <!-- <template v-slot:label="item">
@@ -147,6 +147,7 @@ export default {
           if (res.status === 200) {
             console.log(res);
             resData = res.data;
+            this.income = [];
             for (let each of resData) {
               this.income.push(each);
             }

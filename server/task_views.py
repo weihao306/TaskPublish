@@ -83,6 +83,8 @@ def query_one_task(request):
     Task.objects.filter(end_time__lt=date.today()).update(
         task_status=Task.OVERDUE)
 
+    
+
     body = request.GET
     task_id = body.get('task_id', '')
     try:
@@ -134,8 +136,15 @@ def create_task(request):
     description = body.get('description', '')
     cur_people = body.get('cur_people', 0)
     max_people = body.get('max_people', 0)
-   # start_time = body.get('start_time', date.today().strftime('%d-%m-%Y'))
-   #  end_time = body.get('end_time', date.today().strftime('%d-%m-%Y'))
+    # DateFormat sdf = new SimpleDateFormat("YYYY-mm-dd")
+    # start_time = date(body.get('start_time',''))
+    
+    start_time = datetime.strptime(
+        body.get('start_time', ''), "%Y-%m-%d").date()
+    # end_time = date(body.get('end_time', ''))
+    end_time = datetime.strptime(
+        body.get('end_time', ''), "%Y-%m-%d").date()
+    
     task_status = 0
     photo = body.get('photos', None)
 
@@ -156,8 +165,8 @@ def create_task(request):
                     description=description,
                     cur_people=cur_people,
                     max_people=max_people,
-                    # start_time=start_time,
-                    # end_time=end_time,
+                    start_time=start_time,
+                    end_time=end_time,
                     task_status=task_status,
                     photo=photo,
                 )

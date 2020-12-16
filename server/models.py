@@ -1,5 +1,6 @@
 import os
 
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import DO_NOTHING, CASCADE
 from django.utils.translation import ugettext_lazy as _
@@ -128,8 +129,11 @@ class Task(CreateUpdateMixin):
         _(u'结束日期'), null=True, blank=True, help_text=u'结束日期')
     task_status = models.IntegerField(
         _(u'召集令状态'), default=WAITING, choices=TASK_STATUS, help_text=u'召集令状态')
-    photo = models.ImageField(
-        _(u'介绍图片'), upload_to=user_directory_path, blank=True, null=True)
+    # photo = models.ImageField(
+    #     _(u'介绍图片'), upload_to=user_directory_path, blank=True, null=True)
+
+    photo = models.CharField(validators=[
+        validate_comma_separated_integer_list], max_length=163840, blank=True, null=True, default='')
 
     def __str__(self):
         return str(self.task_name)
@@ -172,6 +176,7 @@ class Request(CreateUpdateMixin):
         _(u'接令人姓名'), max_length=32, blank=True, null=True, help_text=u'接令人姓名')
     def __str__(self):
         return str(self.pk)
+        
 
 
 class Success(CreateUpdateMixin):

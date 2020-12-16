@@ -52,12 +52,6 @@
                 () => publishOrderInfo.info.length <= 200 || '最多200字',
               ]"
             >
-              <!-- <v-progress-linear
-            slot="progress"
-            value="progress"
-            height="7"
-            color="primary"
-          ></v-progress-linear> -->
             </v-textarea>
           </v-card-text>
 
@@ -97,15 +91,19 @@
                   <v-text-field
                     v-model="publishOrderInfo.maximumSummoningCount"
                     dense
-                    type="number"
+                    type="Number"
                     messages="max 200"
                     hint="max 200"
                     d-flex
+                    @change="
+                      publishOrderInfo.maximumSummoningCount = parseInt(
+                        publishOrderInfo.maximumSummoningCount
+                      )
+                    "
                     max-width="2rem"
                     class="Height_24"
                     oninput="if(parseInt(value)>200)value=200;if(parseInt(value)<0)value=0;"
-                    :rules="[
-                    ]"
+                    :rules="[]"
                   >
                   </v-text-field>
                 </v-col>
@@ -131,6 +129,50 @@
                   </v-btn>
                 </v-col>
               </v-row>
+            </v-flex>
+          </v-layout>
+
+          <v-layout row wrap justify-center>
+            <v-flex xs8 sm4 md4 class="align-center my-1">
+              <v-menu
+                ref="menu"
+                v-model="menu"
+                :close-on-content-click="false"
+                :return-value.sync="date"
+                transition="scale-transition"
+                offset-y
+                max-width="30rem"
+                min-width="16rem"
+                class="col-8"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    name="time"
+                    label="活动截止时间"
+                    v-model="publishOrderInfo.end_date"
+                    style="text-align-last: center"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                    outlined
+                    dense
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="publishOrderInfo.end_date" scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="menu = false">
+                    取消
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.menu.save(publishOrderInfo.end_date)"
+                  >
+                    OK
+                  </v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-flex>
           </v-layout>
 
@@ -172,7 +214,10 @@
 
               <!-- <img v-for="img of imgs" :key="img.key" :src="img"> -->
               <v-window v-model="onboarding">
-                <v-window-item v-for="(img, n1) of imgs" :key="`card-${n1}`">
+                <v-window-item
+                  v-for="(img, n1) of publishOrderInfo.photos"
+                  :key="`card-${n1}`"
+                >
                   <v-card class="mx-auto my-auto elevation-8">
                     <v-img contain :src="img" height="30vh"> </v-img>
                     <!-- <v-card-title primary-title> </v-card-title> -->
@@ -184,7 +229,10 @@
                 mandatory
                 class="text-center justify-center"
               >
-                <v-item v-for="(img, n2) of imgs" :key="`btn-${n2}`">
+                <v-item
+                  v-for="(img, n2) of publishOrderInfo.photos"
+                  :key="`btn-${n2}`"
+                >
                   <v-btn
                     slot-scope="{ active, toggle }"
                     :input-value="active"
@@ -213,6 +261,7 @@ import OrderInfo from "@/classes/OrderInfo";
 export default {
   mounted() {
     this.publishOrderInfo.maximumSummoningCount = 0;
+    this.publishOrderInfo.master_id = this.$store.state.userInfo.uid;
   },
   data() {
     return {
@@ -261,7 +310,7 @@ export default {
           // url = "data:image/*;base64," + tmpUrl;
           url = fr.result;
           console.log(url);
-          this.imgs.unshift(fr.result);
+          this.publishOrderInfo.photos.unshift(fr.result);
         };
       }
     },
@@ -274,33 +323,46 @@ export default {
         // tmpUrl = this.result.substring(this.result.indexOf(",") + 1);
         // url = "data:image/*;base64," + tmpUrl;
         url = fr.result;
-        this.imgs.push(fr.result);
+        this.publishOrderInfo.photos.push(fr.result);
       };
       return url;
     },
     publishNewOrder() {
-      this.axios
-        .post("api/tasks", {
-          master_id: this.$store.state.userInfo.uid,
-          task_type: this.publishOrderInfo.type,
-          task_name: this.publishOrderInfo.name,
-          description: this.publishOrderInfo.info,
-          cur_people: this.publishOrderInfo.currentSummoningCount,
-          max_people: this.publishOrderInfo.maximumSummoningCount,
-          start_time: new Date().toLocaleDateString(),
-          end_time: this.publishOrderInfo.date,
-          task_status: this.publishOrderInfo.status,
-          photos: this.publishOrderInfo.photos,
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            alert("发布成功");
-            this.$router.push({ name: "Master" });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      // 开始时间
+      this.publishOrderInfo.start_date = new Date().toLocaleDateString().split('/').join('-');
+      if (
+        (this.publishOrderInfo.name !== undefined ||
+          this.publishOrderInfo.name !== "") &&
+        // this.publishOrderInfo.type instanceof Number &&
+        this.publishOrderInfo.maximumSummoningCount > 0 &&
+        (this.publishOrderInfo.end_date !== undefined ||
+          this.publishOrderInfo.end_date !== "")
+      ) {
+        this.axios
+          .post("api/tasks", {
+            master_id: this.$store.state.userInfo.uid,
+            task_type: this.publishOrderInfo.type,
+            task_name: this.publishOrderInfo.name,
+            description: this.publishOrderInfo.info,
+            cur_people: this.publishOrderInfo.currentSummoningCount,
+            max_people: this.publishOrderInfo.maximumSummoningCount,
+            start_time: this.publishOrderInfo.start_date,
+            end_time: this.publishOrderInfo.end_date,
+            task_status: this.publishOrderInfo.status,
+            photos: JSON.stringify(this.publishOrderInfo.photos),
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              alert("发布成功");
+              this.$router.push({ name: "Master" });
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      } else {
+        alert("完整填写信息");
+      }
     },
 
     next() {
@@ -313,27 +375,27 @@ export default {
   watch: {
     uploadPhotos() {
       if (this.uploadPhotos.length === 0) {
-        while (this.imgs.length !== 0) {
-          this.imgs.pop();
+        while (this.publishOrderInfo.photos.length !== 0) {
+          this.publishOrderInfo.photos.pop();
         }
       }
     },
-    publishOrderInfo: {
-      handler(oldVal, newVal) {
-        if (
-          !this.$data.publishOrderInfo.maximumSummoningCount instanceof Number
-        ) {
-          this.$data.publishOrderInfo.maximumSummoningCount = new Number(
-            newVal
-          );
-        }
-        if (newVal > 200 || newVal < 0) {
-          this.$data.publishOrderInfo.maximumSummoningCount = oldVal;
-        }
-      },
-      immediate: true,
-      deep: true,
-    },
+    // publishOrderInfo: {
+    //   handler(oldVal, newVal) {
+    //     if (
+    //       !this.$data.publishOrderInfo.maximumSummoningCount instanceof Number
+    //     ) {
+    //       this.$data.publishOrderInfo.maximumSummoningCount = new Number(
+    //         newVal
+    //       );
+    //     }
+    //     if (newVal > 200 || newVal < 0) {
+    //       this.$data.publishOrderInfo.maximumSummoningCount = oldVal;
+    //     }
+    //   },
+    //   immediate: true,
+    //   deep: true,
+    // },
   },
 };
 </script>
@@ -356,7 +418,7 @@ input[type="number"] {
   text-align: center;
 }
 /* hack */
-.v-messages__message{
+.v-messages__message {
   text-align: center;
 }
 </style>
